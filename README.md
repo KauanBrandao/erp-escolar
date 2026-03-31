@@ -15,7 +15,6 @@ app/
 ├── schemas/          # Validação de Dados (Pydantic / DTOs)
 ├── core/             # Configurações globais e Segurança (ou config/)
 └── main.py           # Ponto de entrada da aplicação
-
 ```
 
 
