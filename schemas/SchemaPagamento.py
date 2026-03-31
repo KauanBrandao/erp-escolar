@@ -1,0 +1,2 @@
+class SchemaPagamento:
+    pass

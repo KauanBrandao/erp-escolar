@@ -1,0 +1,2 @@
+class ModelMensalidade:
+    pass

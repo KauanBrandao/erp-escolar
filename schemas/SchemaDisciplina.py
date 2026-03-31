@@ -1,0 +1,2 @@
+class SchemaDisciplina:
+    pass

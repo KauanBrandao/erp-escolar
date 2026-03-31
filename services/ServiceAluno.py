@@ -1,0 +1,2 @@
+class ServiceAluno:
+    pass

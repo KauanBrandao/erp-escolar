@@ -1,0 +1,2 @@
+class ServiceResponsavel:
+    pass

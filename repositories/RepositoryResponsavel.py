@@ -1,0 +1,2 @@
+class RepositoryResponsavel:
+    pass

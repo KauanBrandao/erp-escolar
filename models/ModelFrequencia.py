@@ -1,0 +1,2 @@
+class ModelFrequencia:
+    pass

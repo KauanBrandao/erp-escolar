@@ -1,0 +1,2 @@
+class ModelPagamento:
+    pass

@@ -1,0 +1,2 @@
+class ServiceMensalidade:
+    pass

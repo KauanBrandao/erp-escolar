@@ -1,0 +1,2 @@
+class ModelAluno:
+    pass

@@ -1,0 +1,2 @@
+class ServicePagamento:
+    pass
