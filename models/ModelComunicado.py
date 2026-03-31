@@ -1,0 +1,2 @@
+class ModelComunicado:
+    pass

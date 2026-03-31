@@ -1,0 +1,2 @@
+class ModelPerfil:
+    pass
