@@ -1,10 +1,12 @@
-from pydantic import BaseModel,EmailStr
+from database import Base
+from sqlalchemy import Column, Integer, String, Date, Boolean
 
+class ModelUsuario(Base):
+    __tablename__ = "Usuarios"
 
-class ModelUsuario(BaseModel):
-    id:int
-    nome:str
-    email:EmailStr
-    senhaHash:str
-    ativo:bool
-    criado_em:str
+    id = Column(Integer, primary_key=True, index=True)
+    nome = Column(String(100), nullable=False)
+    email = Column(String, nullable=False)
+    senha_hash = Column(String, nullable=False)
+    ativo = Column(Boolean, nullable=False)
+    criado_em = Column(Date, nullable=False)
