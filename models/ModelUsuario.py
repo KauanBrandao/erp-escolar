@@ -10,4 +10,4 @@ class ModelUsuario(Base):
     senha_hash = Column(String, nullable=False)
     ativo = Column(Boolean, nullable=False)
     criado_em = Column(Date, nullable=False)
-    usuario_id = Column(Integer, ForeignKey("Perfis.id"))
+    perfil_id = Column(Integer, ForeignKey("Perfis.id"))
