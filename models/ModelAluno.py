@@ -1,5 +1,7 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Boolean, Date, BigInteger
+from sqlalchemy import (BigInteger, Boolean, Column, Date, ForeignKey, Integer,
+                        String)
+
 
 class ModelAluno(Base):
     __tablename__ = "Alunos"
@@ -11,4 +13,7 @@ class ModelAluno(Base):
     ativo = Column(Boolean, nullable=False)
     data_nascimento = Column(Date, nullable=False)
     criado_em = Column(Date, nullable=False)
+    responsavel_id = Column(Integer, ForeignKey("Responsaveis.id"))
+
+    responsavel_id = Column(Integer, ForeignKey("Responsaveis.id"))
 
