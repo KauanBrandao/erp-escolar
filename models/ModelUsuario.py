@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Date, Boolean
+from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey
 
 class ModelUsuario(Base):
     __tablename__ = "Usuarios"
@@ -10,3 +10,4 @@ class ModelUsuario(Base):
     senha_hash = Column(String, nullable=False)
     ativo = Column(Boolean, nullable=False)
     criado_em = Column(Date, nullable=False)
+    usuario_id = Column(Integer, ForeignKey("Perfis.id"))
