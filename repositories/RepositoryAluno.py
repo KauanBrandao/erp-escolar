@@ -19,7 +19,7 @@ class RepositoryAlunoCreate(RepositoryAlunoBase):
     pass
 
 # 3 Oque a API vai receber (GET)
-class RepositoryAlunoResponse():
+class RepositoryAlunoResponse(RepositoryAlunoBase):
     id: int
     criado_em: date
 
@@ -29,7 +29,7 @@ class RepositoryAlunoResponse():
 
 
 # 4. Schema de Atualização: Todos os campos viram opcionais (PATCH/PUT)
-class AlunoUpdate(BaseModel):
+class RepositoryAlunoUpdate(BaseModel):
     nome: Optional[str] = None
     telefone: Optional[int] = None
     ativo: Optional[bool] = None
