@@ -10,6 +10,6 @@ class ModelTurma(Base):
     turno = Column(String(20), nullable=False)
     ano_letivo = Column(Integer, nullable=False)
     ativo = Column(Boolean, nullable=False, default=True)
-    professor_id = Column(Integer, ForeignKey("Usuarios.id"), nullable=True)
+    perfil_id = Column(Integer, ForeignKey("Usuarios.id"), nullable=True)
 
    

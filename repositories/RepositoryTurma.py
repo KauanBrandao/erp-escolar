@@ -7,7 +7,7 @@ class RepositoryTurmaBase(BaseModel):
     turno: str = Field(..., description="Matutino, vespertino ou noturno")
     ano_letivo: str = Field(..., ge=2000, le=2100)
     ativo = bool = True
-    professor_id: Optional[int] = None
+    perfil_id: Optional[int] = None
 
 class RepositoryTurmaCreate(RepositoryTurmaBase):
     pass
@@ -24,5 +24,5 @@ class RepositoruTurmaUpdade(BaseModel):
     turno: Optional[str] = None
     ano_letivo: Optional[int] = None
     ativo: Optional[bool] = None
-    professor_id: Optional[bool] = None
+    perfil_id: Optional[bool] = None
 
