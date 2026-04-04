@@ -6,7 +6,6 @@ class RepositoryTurmaBase(BaseModel):
     serie: str = Field(..., min_length=2, max_length=50, description="Ex: 1 Ano")
     turno: str = Field(..., description="Matutino, vespertino ou noturno")
     ano_letivo: str = Field(..., ge=2000, le=2100)
-    ativo = bool = True
     perfil_id: Optional[int] = None
 
 class RepositoryTurmaCreate(RepositoryTurmaBase):
@@ -23,6 +22,5 @@ class RepositoruTurmaUpdade(BaseModel):
     serie: Optional[str] = None
     turno: Optional[str] = None
     ano_letivo: Optional[int] = None
-    ativo: Optional[bool] = None
     perfil_id: Optional[bool] = None
 

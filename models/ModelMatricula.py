@@ -9,7 +9,6 @@ class ModelMatricula(Base):
     turma_id = Column(Integer, ForeignKey("Turmas.id"), nullable=False)
     data_matricula = Column(Date, nullable=False)
     status = Column(String(20), nullable=False, default="ativa") #ou trancada, cancelada
-    ativo = Column(Boolean, nullable=False, default=True)
-
+    observacao = Column(String(250), nullable=True)
 
    
