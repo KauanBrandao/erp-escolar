@@ -8,5 +8,5 @@ class ModelDisciplina(Base):
     nome = Column(String(100), nullable=False)
     codigo = Column(String(20), nullable=False, unique=True)
     carga_horaria = Column(Integer, nullable=False)
-    ativo = Column(Boolean, nullable=False, default=True)
+    turma_id = Column(Integer, ForeignKey("Turmas.id"), nullable=False)
     
