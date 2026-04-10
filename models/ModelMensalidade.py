@@ -5,6 +5,8 @@ from sqlalchemy import Column, Date, Float, ForeignKey, Integer, String
 
 
 class ModelMensalidade(Base):
+    __tablename__ = "Mensalidade" 
+
     id = Column(Integer, primary_key=True, index=True)
     aluno_id = Column(Integer,ForeignKey("Alunos.id"), nullable=False)
     mes = Column(Integer, nullable=False)
