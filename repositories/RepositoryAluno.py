@@ -25,7 +25,7 @@ class AlunoRepository:
         return self.db.query(ModelAluno).offset(skip).limit(limit).all()
     
     def update(self, aluno_id: int, aluno_data: AlunoUpdate) -> Optional[ModelAluno]:
-        db_aluno = self.db.get(aluno_id)
+        db_aluno = self.db.get(ModelAluno,aluno_id)
         if db_aluno:
             # .model_dump(exclude_unset=True) garante que só atualizaremos 
             # os campos que o usuário de fato enviou no JSON
