@@ -1,4 +1,4 @@
-from database import Base
+from models.database import Base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 
 class ModelTurma(Base):

@@ -2,3 +2,7 @@
 venv
 .vscode/
 .git
+.postman/
+postman/
+__pycache__/
+.venv
