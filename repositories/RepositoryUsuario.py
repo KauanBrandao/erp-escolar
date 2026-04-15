@@ -8,7 +8,7 @@ from schemas.SchemaUsuario import UsuarioCreate, UsuarioUpdate
 
 
 class UsuarioRepository:
-    def __int__(self, db:Session):
+    def __init__(self, db:Session):
         self.db = db
     
     def create(self, usuario:UsuarioCreate) -> ModelUsuario:
