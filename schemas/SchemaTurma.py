@@ -19,7 +19,7 @@ class RepositoruTurmaResponse(TurmaBase):
     class Config:
         from_attribute = True
 
-class TurmaUpdade(BaseModel):
+class TurmaUpdate(BaseModel):
     nome: Optional[str] = None
     serie: Optional[str] = None
     turno: Optional[str] = None
