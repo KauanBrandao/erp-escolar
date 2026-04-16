@@ -18,25 +18,25 @@ def get_db():
 
 
 @router.post("/", response_model=PagamentoResponse, status_code=201)
-def criar_aluno(dados: PagamentoCreate, db: Session = Depends(get_db)):
+def criar_pagamento(dados: PagamentoCreate, db: Session = Depends(get_db)):
     return ServicePagamento(db).criar(dados)
 
 
 @router.get("/", response_model=list[PagamentoResponse])
-def listar_alunos(db: Session = Depends(get_db)):
+def listar_pagamento(db: Session = Depends(get_db)):
     return ServicePagamento(db).listar()
 
 
 @router.get("/{pagamento_id}", response_model=PagamentoResponse)
-def buscar_aluno(pagamento_id: int, db: Session = Depends(get_db)):
+def buscar_pagamento(pagamento_id: int, db: Session = Depends(get_db)):
     return ServicePagamento(db).buscar_por_id(pagamento_id)
 
 
 @router.put("/{pagamento_id}", response_model=PagamentoResponse)
-def atualizar_aluno(pagamento_id: int, dados: PagamentoUpdate, db: Session = Depends(get_db)):
+def atualizar_pagamento(pagamento_id: int, dados: PagamentoUpdate, db: Session = Depends(get_db)):
     return ServicePagamento(db).atualizar(pagamento_id, dados)
 
 
 @router.delete("/{pagamento_id}")
-def deletar_aluno(pagamento_id: int, db: Session = Depends(get_db)):
+def deletar_pagamento(pagamento_id: int, db: Session = Depends(get_db)):
     return ServicePagamento(db).deletar(pagamento_id)

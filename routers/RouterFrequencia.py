@@ -18,25 +18,25 @@ def get_db():
 
 
 @router.post("/", response_model=FrequenciaResponse, status_code=201)
-def criar_aluno(dados: FrequenciaCreate, db: Session = Depends(get_db)):
+def criar_frequencia(dados: FrequenciaCreate, db: Session = Depends(get_db)):
     return ServiceFrequencia(db).criar(dados)
 
 
 @router.get("/", response_model=list[FrequenciaResponse])
-def listar_alunos(db: Session = Depends(get_db)):
+def listar_frequencia(db: Session = Depends(get_db)):
     return ServiceFrequencia(db).listar()
 
 
 @router.get("/{frequencia_id}", response_model=FrequenciaResponse)
-def buscar_aluno(frequencia_id: int, db: Session = Depends(get_db)):
+def buscar_frequencia(frequencia_id: int, db: Session = Depends(get_db)):
     return ServiceFrequencia(db).buscar_por_id(frequencia_id)
 
 
 @router.put("/{frequencia_id}", response_model=FrequenciaResponse)
-def atualizar_aluno(frequencia_id: int, dados: FrequenciaUpdate, db: Session = Depends(get_db)):
+def atualizar_frequencia(frequencia_id: int, dados: FrequenciaUpdate, db: Session = Depends(get_db)):
     return ServiceFrequencia(db).atualizar(frequencia_id, dados)
 
 
 @router.delete("/{frequencia_id}")
-def deletar_aluno(frequencia_id: int, db: Session = Depends(get_db)):
+def deletar_frequencia(frequencia_id: int, db: Session = Depends(get_db)):
     return ServiceFrequencia(db).deletar(frequencia_id)

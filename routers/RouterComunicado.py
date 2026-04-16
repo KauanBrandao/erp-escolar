@@ -18,25 +18,25 @@ def get_db():
 
 
 @router.post("/", response_model=ComunicadoResponse, status_code=201)
-def criar_aluno(dados: ComunicadoCreate, db: Session = Depends(get_db)):
+def criar_comunicado(dados: ComunicadoCreate, db: Session = Depends(get_db)):
     return ServiceComunicado(db).criar(dados)
 
 
 @router.get("/", response_model=list[ComunicadoResponse])
-def listar_alunos(db: Session = Depends(get_db)):
+def listar_comunicado(db: Session = Depends(get_db)):
     return ServiceComunicado(db).listar()
 
 
 @router.get("/{comunicado_id}", response_model=ComunicadoResponse)
-def buscar_aluno(comunicado_id: int, db: Session = Depends(get_db)):
+def buscar_comunicado(comunicado_id: int, db: Session = Depends(get_db)):
     return ServiceComunicado(db).buscar_por_id(comunicado_id)
 
 
 @router.put("/{comunicado_id}", response_model=ComunicadoResponse)
-def atualizar_aluno(comunicado_id: int, dados: ComunicadoUpdate, db: Session = Depends(get_db)):
+def atualizar_comunicado(comunicado_id: int, dados: ComunicadoUpdate, db: Session = Depends(get_db)):
     return ServiceComunicado(db).atualizar(comunicado_id, dados)
 
 
 @router.delete("/{comunicado_id}")
-def deletar_aluno(comunicado_id: int, db: Session = Depends(get_db)):
+def deletar_comunicado(comunicado_id: int, db: Session = Depends(get_db)):
     return ServiceComunicado(db).deletar(comunicado_id)
