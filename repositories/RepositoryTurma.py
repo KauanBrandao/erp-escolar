@@ -9,11 +9,11 @@ class TurmaRepository:
         self.db = db
 
     def create(self, data: TurmaCreate) -> ModelTurma:
-        db_obj = ModelTurma(**data.model_dump(),criado_em = date.today())
+        db_obj = ModelTurma(data.model_dump(),criado_em = date.today())
         self.db.add(db_obj)
         self.db.commit()
         self.db.refresh(db_obj)
-        self.db.refresh(db_obj)
+        return db_obj
     
     def get_by_id(self, obj_id: int) -> Optional[ModelTurma]:
         return self.db.query(ModelTurma).filter(ModelTurma.id == obj_id).first()
