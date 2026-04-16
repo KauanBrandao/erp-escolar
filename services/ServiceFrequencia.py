@@ -6,17 +6,17 @@ class ServiceFrequencia:
     def __init__(self, db: Session):
         self.repo = FrequenciaRepository(db)
 
-    def create(self, data):
+    def criar(self, data):
         return self.repo.create(data)
 
-    def get_by_id(self, obj_id: int):
+    def buscar_por_id(self, obj_id: int):
         return self.repo.get_byID(obj_id)
 
-    def get_all(self, skip: int = 0, limit: int = 100):
+    def listar(self, skip: int = 0, limit: int = 100):
         return self.repo.get_all(skip, limit)
 
-    def update(self, obj_id: int, data):
+    def atualizar(self, obj_id: int, data):
         return self.repo.update(obj_id, data)
 
-    def delete(self, obj_id: int):
+    def deletar(self, obj_id: int):
         return self.repo.delete(obj_id)

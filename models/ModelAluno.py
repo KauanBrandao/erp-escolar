@@ -1,5 +1,5 @@
 from models.database import Base
-from sqlalchemy import (BigInteger, Boolean, Column, Date, ForeignKey, Integer,
+from sqlalchemy import (Boolean, Column, Date, ForeignKey, Integer,
                         String)
 
 
@@ -8,7 +8,7 @@ class ModelAluno(Base):
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String(100), nullable=False)
     cpf = Column(String(15), nullable=False, unique=True)
-    telefone = Column(BigInteger, nullable=False, unique=True)
+    telefone = Column(String(20), nullable=False, unique=True)
     matricula_numero = Column(Integer, nullable=False, unique=True)
     ativo = Column(Boolean, nullable=False)
     data_nascimento = Column(Date, nullable=False)

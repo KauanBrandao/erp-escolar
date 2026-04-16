@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 class AlunoBase(BaseModel):
     nome: str
     cpf: str = Field(..., pattern=r"^\d{11,15}$")
-    telefone: int
+    telefone: str = Field(..., pattern=r"^\+?\d{10,15}$")
     matricula_numero: int
     ativo: bool = True
     data_nascimento: date
@@ -24,5 +24,5 @@ class AlunoResponse(AlunoBase):
 
 class AlunoUpdate(BaseModel):
     nome: Optional[str] = None
-    telefone: Optional[int] = None
+    telefone: Optional[str] = Field(None, pattern=r"^\+?\d{10,15}$")
     ativo: Optional[bool] = None
