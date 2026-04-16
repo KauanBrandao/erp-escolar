@@ -1,0 +1,4 @@
+[2026-04-16 14:56] joao@escola.com - Cadastro de usuario: Joao Operador
+[2026-04-16 14:57] admin2@escola.com - Cadastro de usuario: Admin Geral
+[2026-04-16 14:57] maria@escola.com - Cadastro de usuario: Maria Operadora
+[2026-04-16 15:15] adminteste@escola.com - Cadastro de usuario: Admin Teste

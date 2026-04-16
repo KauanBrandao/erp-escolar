@@ -21,4 +21,4 @@ watchfiles==1.1.1
 websockets==16.0
 
 #python == 3.13.11
-#Tirei o uvloop pois não funciona no windows
+#Tirei o uvloop pois não funciona no windows    
