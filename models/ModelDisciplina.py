@@ -1,5 +1,5 @@
-from database import Base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from models.database import Base
+from sqlalchemy import Column, Integer, String, ForeignKey
 
 class ModelDisciplina(Base):
     __tablename__ = "Disciplinas"

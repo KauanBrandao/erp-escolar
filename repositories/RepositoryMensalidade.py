@@ -1,6 +1,3 @@
-from datetime import date
-from typing import List, Optional
-
 from sqlalchemy.orm import Session
 
 from models.ModelMensalidade import ModelMensalidade
@@ -11,40 +8,41 @@ class MensalidadeRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create(self, data: MensalidadeCreate) -> ModelMensalidade:
-        db_obj = ModelMensalidade(**data.model_dump(), criado_em=date.today())
-        self.db.add(db_obj)
+    def create(self, mensalidade: MensalidadeCreate) -> ModelMensalidade:
+        db_mensalidade = ModelMensalidade(**mensalidade.model_dump())
+        self.db.add(db_mensalidade)
         self.db.commit()
-        self.db.refresh(db_obj)
-        return db_obj
+        self.db.refresh(db_mensalidade)
+        return db_mensalidade
 
-    def get_by_id(self, obj_id: int) -> Optional[ModelMensalidade]:
-        return self.db.query(ModelMensalidade).filter(ModelMensalidade.id == obj_id).first()
+    def get_byID(self, mensalidade_id: int) -> ModelMensalidade | None:
+        return self.db.query(ModelMensalidade).filter(ModelMensalidade.id == mensalidade_id).first()
 
-    def get_byID(self, obj_id: int) -> Optional[ModelMensalidade]:
-        return self.get_by_id(obj_id)
-
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[ModelMensalidade]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelMensalidade]:
         return self.db.query(ModelMensalidade).offset(skip).limit(limit).all()
 
-    def update(self, obj_id: int, data: MensalidadeUpdate) -> Optional[ModelMensalidade]:
-        db_obj = self.get_by_id(obj_id)
-        if not db_obj:
+    def update(self, mensalidade_id: int, dados: MensalidadeUpdate) -> ModelMensalidade | None:
+        mensalidade = self.get_byID(mensalidade_id)
+        if not mensalidade:
             return None
 
-        update_data = data.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
-            setattr(db_obj, key, value)
+        if dados.aluno_id is not None:
+            mensalidade.aluno_id = dados.aluno_id
+        if dados.mes is not None:
+            mensalidade.mes = dados.mes
+        if dados.ano is not None:
+            mensalidade.ano = dados.ano
+        if dados.valor is not None:
+            mensalidade.valor = dados.valor
 
         self.db.commit()
-        self.db.refresh(db_obj)
-        return db_obj
+        self.db.refresh(mensalidade)
+        return mensalidade
 
-    def delete(self, obj_id: int) -> bool:
-        db_obj = self.get_by_id(obj_id)
-        if not db_obj:
+    def delete(self, mensalidade_id: int) -> bool:
+        mensalidade = self.get_byID(mensalidade_id)
+        if not mensalidade:
             return False
-
-        self.db.delete(db_obj)
+        self.db.delete(mensalidade)
         self.db.commit()
         return True

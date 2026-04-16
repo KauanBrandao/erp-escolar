@@ -14,9 +14,9 @@ class PerfilResponse(PerfilBase):
     id: int
     nome: str
 
-    class config:
-        from_atributtes = True
+    class Config:
+        from_attributes = True
 
 class PerfilUpdate(BaseModel):
-    nome: Optional[int] = None
+    nome: Optional[str] = None
     descricao: Optional[str] = None
