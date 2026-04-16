@@ -17,25 +17,25 @@ def get_db():
 
 
 @router.post("/", response_model=PerfilResponse, status_code=201)
-def criar_aluno(dados: PerfilCreate, db: Session = Depends(get_db)):
+def criar_perfil(dados: PerfilCreate, db: Session = Depends(get_db)):
     return ServicePerfil(db).criar(dados)
 
 
 @router.get("/", response_model=list[PerfilResponse])
-def listar_alunos(db: Session = Depends(get_db)):
+def listar_perfis(db: Session = Depends(get_db)):
     return ServicePerfil(db).listar()
 
 
 @router.get("/{perfil_id}", response_model=PerfilResponse)
-def buscar_aluno(perfil_id: int, db: Session = Depends(get_db)):
+def buscar_perfil(perfil_id: int, db: Session = Depends(get_db)):
     return ServicePerfil(db).buscar_por_id(perfil_id)
 
 
 @router.put("/{perfil_id}", response_model=PerfilResponse)
-def atualizar_aluno(perfil_id: int, dados: PerfilUpdate, db: Session = Depends(get_db)):
+def atualizar_perfil(perfil_id: int, dados: PerfilUpdate, db: Session = Depends(get_db)):
     return ServicePerfil(db).atualizar(perfil_id, dados)
 
 
 @router.delete("/{perfil_id}")
-def deletar_aluno(perfil_id: int, db: Session = Depends(get_db)):
+def deletar_perfil(perfil_id: int, db: Session = Depends(get_db)):
     return ServicePerfil(db).deletar(perfil_id)
