@@ -1,3 +1,6 @@
+import calendar
+from datetime import date
+
 from sqlalchemy.orm import Session
 
 from models.ModelMensalidade import ModelMensalidade
@@ -9,7 +12,10 @@ class MensalidadeRepository:
         self.db = db
 
     def create(self, mensalidade: MensalidadeCreate) -> ModelMensalidade:
-        db_mensalidade = ModelMensalidade(**mensalidade.model_dump())
+        dados = mensalidade.model_dump()
+        ultimo_dia = calendar.monthrange(dados["ano"], dados["mes"])[1]
+        vencimento = date(dados["ano"], dados["mes"], ultimo_dia)
+        db_mensalidade = ModelMensalidade(**dados, vencimento=vencimento, status="ativa")
         self.db.add(db_mensalidade)
         self.db.commit()
         self.db.refresh(db_mensalidade)

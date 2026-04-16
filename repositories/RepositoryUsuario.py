@@ -1,3 +1,4 @@
+import hashlib
 from datetime import date
 
 from sqlalchemy.orm import Session
@@ -11,7 +12,9 @@ class UsuarioRepository:
         self.db = db
 
     def create(self, usuario: UsuarioCreate) -> ModelUsuario:
-        db_usuario = ModelUsuario(**usuario.model_dump(), criado_em=date.today())
+        dados = usuario.model_dump()
+        senha_hash = hashlib.sha256(dados.pop("senha").encode()).hexdigest()
+        db_usuario = ModelUsuario(**dados, senha_hash=senha_hash, criado_em=date.today())
         self.db.add(db_usuario)
         self.db.commit()
         self.db.refresh(db_usuario)

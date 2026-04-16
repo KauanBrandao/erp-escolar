@@ -1,4 +1,3 @@
-from datetime import date
 from typing import List, Optional
 from sqlalchemy.orm import Session
 from models.ModelTurma import ModelTurma
@@ -9,7 +8,7 @@ class TurmaRepository:
         self.db = db
 
     def create(self, data: TurmaCreate) -> ModelTurma:
-        db_obj = ModelTurma(data.model_dump(),criado_em = date.today())
+        db_obj = ModelTurma(**data.model_dump())
         self.db.add(db_obj)
         self.db.commit()
         self.db.refresh(db_obj)

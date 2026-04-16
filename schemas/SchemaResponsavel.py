@@ -10,12 +10,12 @@ class ResponsavelBase(BaseModel):
 
 class ResponsavelCreate(ResponsavelBase):
     cpf: str = Field(..., pattern=r"^\d{11,15}$")
-    telefone: int
+    telefone: str = Field(..., pattern=r"^\+?\d{10,15}$")
 
 class ResponsavelResponse(ResponsavelBase):
     id: int
     cpf: str
-    telefone: int
+    telefone: str
 
     class Config:
         from_attributes = True

@@ -1,5 +1,5 @@
 from models.database import Base
-from sqlalchemy import Column, Integer, String, ForeignKey, BigInteger
+from sqlalchemy import Column, Integer, String, ForeignKey
 
 class ModelResponsavel(Base):
     __tablename__ = "Responsaveis"
@@ -7,6 +7,6 @@ class ModelResponsavel(Base):
     id = Column(Integer, primary_key=True, index=True)
     nome = Column(String(100), nullable=False)
     cpf = Column(String(15), nullable=False, unique=True)
-    telefone = Column(BigInteger, nullable=False, unique=True)
+    telefone = Column(String(20), nullable=False, unique=True)
     email = Column(String(150), nullable=False, unique=True)
     parentesco = Column(Integer, ForeignKey("Usuarios.id"))
