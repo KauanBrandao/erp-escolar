@@ -6,7 +6,7 @@ from schemas.SchemaComunicado import (ComunicadoCreate, ComunicadoResponse,
                                       ComunicadoUpdate)
 from services.ServiceComunicado import ServiceComunicado
 
-router = APIRouter(prefix="/comunicados", tags=["Alunos"])
+router = APIRouter(prefix="/comunicados", tags=["Comunicados"])
 
 
 def get_db():
