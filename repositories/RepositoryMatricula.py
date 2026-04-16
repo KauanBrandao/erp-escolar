@@ -1,6 +1,5 @@
-from datetime import date
-from typing import List, Optional
 from sqlalchemy.orm import Session
+
 from models.ModelMatricula import ModelMatricula
 from schemas.SchemaMatricula import MatriculaCreate, MatriculaUpdate
 
@@ -9,40 +8,39 @@ class MatriculaRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create(self, data: MatriculaCreate) -> ModelMatricula:
-        db_obj = ModelMatricula(**data.model_dump(), criado_em=date.today())
-        self.db.add(db_obj)
+    def create(self, matricula: MatriculaCreate) -> ModelMatricula:
+        db_matricula = ModelMatricula(**matricula.model_dump())
+        self.db.add(db_matricula)
         self.db.commit()
-        self.db.refresh(db_obj)
-        return db_obj
+        self.db.refresh(db_matricula)
+        return db_matricula
 
-    def get_by_id(self, obj_id: int) -> Optional[ModelMatricula]:
-        return self.db.query(ModelMatricula).filter(ModelMatricula.id == obj_id).first()
+    def get_byID(self, matricula_id: int) -> ModelMatricula | None:
+        return self.db.query(ModelMatricula).filter(ModelMatricula.id == matricula_id).first()
 
-    def get_byID(self, obj_id: int) -> Optional[ModelMatricula]:
-        return self.get_by_id(obj_id)
-
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[ModelMatricula]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelMatricula]:
         return self.db.query(ModelMatricula).offset(skip).limit(limit).all()
 
-    def update(self, obj_id: int, data: MatriculaUpdate) -> Optional[ModelMatricula]:
-        db_obj = self.get_by_id(obj_id)
-        if not db_obj:
+    def update(self, matricula_id: int, dados: MatriculaUpdate) -> ModelMatricula | None:
+        matricula = self.get_byID(matricula_id)
+        if not matricula:
             return None
 
-        update_data = data.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
-            setattr(db_obj, key, value)
+        if dados.turma_id is not None:
+            matricula.turma_id = dados.turma_id
+        if dados.status is not None:
+            matricula.status = dados.status
+        if dados.observacao is not None:
+            matricula.observacao = dados.observacao
 
         self.db.commit()
-        self.db.refresh(db_obj)
-        return db_obj
+        self.db.refresh(matricula)
+        return matricula
 
-    def delete(self, obj_id: int) -> bool:
-        db_obj = self.get_by_id(obj_id)
-        if not db_obj:
+    def delete(self, matricula_id: int) -> bool:
+        matricula = self.get_byID(matricula_id)
+        if not matricula:
             return False
-
-        self.db.delete(db_obj)
+        self.db.delete(matricula)
         self.db.commit()
         return True

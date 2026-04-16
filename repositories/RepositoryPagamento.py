@@ -1,6 +1,5 @@
-from datetime import date
-from typing import List, Optional
 from sqlalchemy.orm import Session
+
 from models.ModelPagamento import ModelPagamento
 from schemas.SchemaPagamento import PagamentoCreate, PagamentoUpdate
 
@@ -9,40 +8,41 @@ class PagamentoRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create(self, data: PagamentoCreate) -> ModelPagamento:
-        db_obj = ModelPagamento(**data.model_dump(), criado_em=date.today())
-        self.db.add(db_obj)
+    def create(self, pagamento: PagamentoCreate) -> ModelPagamento:
+        db_pagamento = ModelPagamento(**pagamento.model_dump())
+        self.db.add(db_pagamento)
         self.db.commit()
-        self.db.refresh(db_obj)
-        return db_obj
+        self.db.refresh(db_pagamento)
+        return db_pagamento
 
-    def get_by_id(self, obj_id: int) -> Optional[ModelPagamento]:
-        return self.db.query(ModelPagamento).filter(ModelPagamento.id == obj_id).first()
+    def get_byID(self, pagamento_id: int) -> ModelPagamento | None:
+        return self.db.query(ModelPagamento).filter(ModelPagamento.id == pagamento_id).first()
 
-    def get_byID(self, obj_id: int) -> Optional[ModelPagamento]:
-        return self.get_by_id(obj_id)
-
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[ModelPagamento]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelPagamento]:
         return self.db.query(ModelPagamento).offset(skip).limit(limit).all()
 
-    def update(self, obj_id: int, data: PagamentoUpdate) -> Optional[ModelPagamento]:
-        db_obj = self.get_by_id(obj_id)
-        if not db_obj:
+    def update(self, pagamento_id: int, dados: PagamentoUpdate) -> ModelPagamento | None:
+        pagamento = self.get_byID(pagamento_id)
+        if not pagamento:
             return None
 
-        update_data = data.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
-            setattr(db_obj, key, value)
+        if dados.data_pagamento is not None:
+            pagamento.data_pagamento = dados.data_pagamento
+        if dados.valor_pago is not None:
+            pagamento.valor_pago = dados.valor_pago
+        if dados.forma_pagamento is not None:
+            pagamento.forma_pagamento = dados.forma_pagamento
+        if dados.comprovante is not None:
+            pagamento.comprovante = dados.comprovante
 
         self.db.commit()
-        self.db.refresh(db_obj)
-        return db_obj
+        self.db.refresh(pagamento)
+        return pagamento
 
-    def delete(self, obj_id: int) -> bool:
-        db_obj = self.get_by_id(obj_id)
-        if not db_obj:
+    def delete(self, pagamento_id: int) -> bool:
+        pagamento = self.get_byID(pagamento_id)
+        if not pagamento:
             return False
-
-        self.db.delete(db_obj)
+        self.db.delete(pagamento)
         self.db.commit()
         return True

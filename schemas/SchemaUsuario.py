@@ -17,8 +17,8 @@ class UsuarioResponse(UsuarioBase):
     id: int
     criado_em: date
 
-    class config:
-        from_atributtes = True
+    class Config:
+        from_attributes = True
 
 class UsuarioUpdate(BaseModel):
     nome: Optional[str] = None
