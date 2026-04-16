@@ -6,7 +6,7 @@ from schemas.SchemaFrequencia import (FrequenciaCreate, FrequenciaResponse,
                                       FrequenciaUpdate)
 from services.ServiceFrequencia import ServiceFrequencia
 
-router = APIRouter(prefix="/Frequencias", tags=["Frequencias"])
+router = APIRouter(prefix="/frequencias", tags=["Frequencias"])
 
 
 def get_db():
