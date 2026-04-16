@@ -1,5 +1,5 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey
 
 class ModelTurma(Base):
     __tablename__ = "Turmas"
@@ -9,6 +9,6 @@ class ModelTurma(Base):
     serie = Column(String(50), nullable=False)
     turno = Column(String(20), nullable=False)
     ano_letivo = Column(Integer, nullable=False)
-    perfil_id = Column(Integer, ForeignKey("Usuarios.id"), nullable=True)
+    perfil_id = Column(Integer, ForeignKey("Perfis.id"), nullable=True)
 
    

@@ -10,4 +10,4 @@ class ModelPagamento(Base):
     valor_pago = Column(Float, nullable=False)
     forma_pagamento = Column(String(50), nullable=False) 
     comprovante = Column(String(255), nullable=True)     
-    mensalidade_id = Column(Integer, ForeignKey("Mensalidades.id"), nullable=False)    # Chave estrangeira ligando à tabela de Mensalidades
+    mensalidade_id = Column(Integer, ForeignKey("Mensalidade.id"), nullable=False)    # Chave estrangeira ligando à tabela de Mensalidades

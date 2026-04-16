@@ -1,47 +1,48 @@
-from datetime import date
-from typing import List, Optional
 from sqlalchemy.orm import Session
+
 from models.ModelDisciplina import ModelDisciplina
 from schemas.SchemaDisciplina import DisciplinaCreate, DisciplinaUpdate
+
 
 class DisciplinaRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create(self, data: DisciplinaCreate) -> ModelDisciplina:
-        db_obj = ModelDisciplina(**data.model_dump(), criado_em=date.today())
-        self.db.add(db_obj)
+    def create(self, disciplina: DisciplinaCreate) -> ModelDisciplina:
+        db_disciplina = ModelDisciplina(**disciplina.model_dump())
+        self.db.add(db_disciplina)
         self.db.commit()
-        self.db.refresh(db_obj)
-        return db_obj
+        self.db.refresh(db_disciplina)
+        return db_disciplina
 
-    def get_by_id(self, obj_id: int) -> Optional[ModelDisciplina]:
-        return self.db.query(ModelDisciplina).filter(ModelDisciplina.id == obj_id).first()
+    def get_byID(self, disciplina_id: int) -> ModelDisciplina | None:
+        return self.db.query(ModelDisciplina).filter(ModelDisciplina.id == disciplina_id).first()
 
-    def get_byID(self, obj_id: int) -> Optional[ModelDisciplina]:
-        return self.get_by_id(obj_id)
-
-    def get_all(self, skip: int = 0, limit: int = 100) -> List[ModelDisciplina]:
+    def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelDisciplina]:
         return self.db.query(ModelDisciplina).offset(skip).limit(limit).all()
 
-    def update(self, obj_id: int, data: DisciplinaUpdate) -> Optional[ModelDisciplina]:
-        db_obj = self.get_by_id(obj_id)
-        if not db_obj:
+    def update(self, disciplina_id: int, dados: DisciplinaUpdate) -> ModelDisciplina | None:
+        disciplina = self.get_byID(disciplina_id)
+        if not disciplina:
             return None
 
-        update_data = data.model_dump(exclude_unset=True)
-        for key, value in update_data.items():
-            setattr(db_obj, key, value)
+        if dados.nome is not None:
+            disciplina.nome = dados.nome
+        if dados.codigo is not None:
+            disciplina.codigo = dados.codigo
+        if dados.carga_horaria is not None:
+            disciplina.carga_horaria = dados.carga_horaria
+        if dados.turma_id is not None:
+            disciplina.turma_id = dados.turma_id
 
         self.db.commit()
-        self.db.refresh(db_obj)
-        return db_obj
+        self.db.refresh(disciplina)
+        return disciplina
 
-    def delete(self, obj_id: int) -> bool:
-        db_obj = self.get_by_id(obj_id)
-        if not db_obj:
+    def delete(self, disciplina_id: int) -> bool:
+        disciplina = self.get_byID(disciplina_id)
+        if not disciplina:
             return False
-
-        self.db.delete(db_obj)
+        self.db.delete(disciplina)
         self.db.commit()
         return True

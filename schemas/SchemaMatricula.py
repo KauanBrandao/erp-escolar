@@ -1,24 +1,24 @@
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class MatriculaBase(BaseModel):
     aluno_id: int
     turma_id: int
     data_matricula: date
-    status: str = Field(default="ativa", description="ativa, trancada ou cancelada")
-    observacao: Optional[str] = Field(None, max_length=250)
+    status: str = "ativa"
+    observacao: Optional[str] = None
 
 class MatriculaCreate(MatriculaBase):
     pass
 
 class MatriculaResponse(MatriculaBase):
-    id:int
-    
+    id: int
+
     class Config:
-        from_atributes = True
+        from_attributes = True
 
 class MatriculaUpdate(BaseModel):
     turma_id: Optional[int] = None

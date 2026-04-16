@@ -15,5 +15,4 @@ class ModelAluno(Base):
     criado_em = Column(Date, nullable=False)
     responsavel_id = Column(Integer, ForeignKey("Responsaveis.id"))
 
-    responsavel_id = Column(Integer, ForeignKey("Responsaveis.id"))
 

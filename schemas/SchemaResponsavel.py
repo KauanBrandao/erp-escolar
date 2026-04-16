@@ -8,17 +8,19 @@ class ResponsavelBase(BaseModel):
     email: EmailStr
     parentesco: int
 
-class ResponsavelResponse(ResponsavelBase):
-    cpf:str = Field(..., pattern=r"^\d{11,15}$")
-
-class ResponsavelResponse(ResponsavelBase):
-    id:int 
+class ResponsavelCreate(ResponsavelBase):
+    cpf: str = Field(..., pattern=r"^\d{11,15}$")
     telefone: int
 
-    class config:
-        from_atributtes = True
+class ResponsavelResponse(ResponsavelBase):
+    id: int
+    cpf: str
+    telefone: int
 
-class Responsavel(BaseModel):
+    class Config:
+        from_attributes = True
+
+class ResponsavelUpdate(BaseModel):
     nome: Optional[str] = None
     email: Optional[EmailStr] = None
     parentesco: Optional[int] = None
