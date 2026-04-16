@@ -9,8 +9,7 @@ class NotaBase(BaseModel):
     valor: Decimal = Field(..., ge=Decimal("0.0"), le=Decimal("10.0"), decimal_places=2)
     tipo: str = Field(..., description="trabalho ou prova")
     bimestre: int = Field(..., ge=1, le=4)
-    aluno_id: int
-    disciplina_id: int
+    disciplina_id:int
 
 class NotaCreate(NotaBase):
     pass
