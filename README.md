@@ -31,8 +31,8 @@ app/
 ## 🛠️ Tecnologias Utilizadas
 
 * **Linguagem:** Python 3
-* **Framework Web:** FastAPI / Flask
-* **Banco de Dados:** PostgreSQL
+* **Framework Web:** FastAPI
+* **Banco de Dados:** Mysql
 * **ORM:** SQLAlchemy
 * **Validação:** Pydantic
 * **Ambiente:** Docker & Docker Compose
