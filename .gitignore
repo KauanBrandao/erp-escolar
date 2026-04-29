@@ -1,8 +1,5 @@
 .env
 venv
 .vscode/
-.git
 .postman/
 postman/
-.gitignore/
-.gitignore
