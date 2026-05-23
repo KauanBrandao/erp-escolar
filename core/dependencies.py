@@ -37,11 +37,23 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise HTTPException(status_code=400, detail="Usuário inativo")
     return user
 
-def get_current_active_admin(current_user: ModelUsuario = Depends(get_current_user), db: Session = Depends(get_db)):
-    perfil = db.query(ModelPerfil).filter(ModelPerfil.id == current_user.perfil_id).first()
-    if not perfil or perfil.nome.lower() not in ["administrador", "diretor"]:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="O usuário não tem privilégios suficientes"
-        )
-    return current_user
+class RoleChecker:
+    def __init__(self, allowed_roles: list[str]):
+        self.allowed_roles = [role.lower() for role in allowed_roles]
+
+    def __call__(self, current_user: ModelUsuario = Depends(get_current_user), db: Session = Depends(get_db)):
+        perfil = db.query(ModelPerfil).filter(ModelPerfil.id == current_user.perfil_id).first()
+        if not perfil or perfil.nome.lower() not in self.allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="O usuário não tem privilégios suficientes"
+            )
+        return current_user
+
+# Perfis definidos: administrador, secretaria, coordenação pedagógica, financeiro, responsavel
+require_admin = RoleChecker(["administrador"])
+require_secretaria = RoleChecker(["administrador", "secretaria"])
+require_coordenacao = RoleChecker(["administrador", "coordenação pedagógica", "coordenação pedagogica"])
+require_financeiro = RoleChecker(["administrador", "financeiro"])
+require_responsavel = RoleChecker(["administrador", "responsavel", "responsável"])
+
