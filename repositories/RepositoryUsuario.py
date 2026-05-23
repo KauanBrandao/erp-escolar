@@ -1,4 +1,4 @@
-import hashlib
+from core.security import get_password_hash
 from datetime import date
 
 from sqlalchemy.orm import Session
@@ -13,7 +13,7 @@ class UsuarioRepository:
 
     def create(self, usuario: UsuarioCreate) -> ModelUsuario:
         dados = usuario.model_dump()
-        senha_hash = hashlib.sha256(dados.pop("senha").encode()).hexdigest()
+        senha_hash = get_password_hash(dados.pop("senha"))
         db_usuario = ModelUsuario(**dados, senha_hash=senha_hash, criado_em=date.today())
         self.db.add(db_usuario)
         self.db.commit()

@@ -13,6 +13,7 @@ from routers.RouterPerfil import router as perfil_router
 from routers.RouterResponsavel import router as responsavel_router
 from routers.RouterTurma import router as turma_router
 from routers.RouterUsuario import router as user_router
+from routers.RouterAuth import router as auth_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -30,3 +31,4 @@ app.include_router(pagamento_router)
 app.include_router(perfil_router)
 app.include_router(responsavel_router)
 app.include_router(user_router)
+app.include_router(auth_router)
