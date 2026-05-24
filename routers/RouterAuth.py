@@ -3,7 +3,8 @@ from sqlalchemy.orm import Session
 
 from core.auth_dependencies import AuthContext, get_current_user
 from core.database import SessionLocal
-from schemas.SchemaAuth import LoginRequest, MeResponse, TokenResponse
+from schemas.SchemaAuth import LoginRequest, MeResponse, SetupAdminRequest, TokenResponse
+from schemas.SchemaUsuario import UsuarioResponse
 from services.ServiceAuth import ServiceAuth
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
@@ -15,6 +16,11 @@ def get_db():
         yield db
     finally:
         db.close()
+
+
+@router.post("/setup-admin", response_model=UsuarioResponse, status_code=201)
+def setup_admin(payload: SetupAdminRequest, db: Session = Depends(get_db)):
+    return ServiceAuth(db).setup_admin(payload.nome, payload.email, payload.senha)
 
 
 @router.post("/login", response_model=TokenResponse)
