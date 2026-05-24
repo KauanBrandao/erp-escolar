@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+﻿from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from core.auth_dependencies import require_permission
 from core.database import SessionLocal
 from schemas.SchemaFrequencia import (FrequenciaCreate, FrequenciaResponse,
                                       FrequenciaUpdate)
@@ -18,25 +19,45 @@ def get_db():
 
 
 @router.post("/", response_model=FrequenciaResponse, status_code=201)
-def criar_frequencia(dados: FrequenciaCreate, db: Session = Depends(get_db)):
+def criar_frequencia(
+    dados: FrequenciaCreate,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("frequencias:write")),
+):
     return ServiceFrequencia(db).criar(dados)
 
 
 @router.get("/", response_model=list[FrequenciaResponse])
-def listar_frequencia(db: Session = Depends(get_db)):
+def listar_frequencia(
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("frequencias:read")),
+):
     return ServiceFrequencia(db).listar()
 
 
 @router.get("/{frequencia_id}", response_model=FrequenciaResponse)
-def buscar_frequencia(frequencia_id: int, db: Session = Depends(get_db)):
+def buscar_frequencia(
+    frequencia_id: int,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("frequencias:read")),
+):
     return ServiceFrequencia(db).buscar_por_id(frequencia_id)
 
 
 @router.put("/{frequencia_id}", response_model=FrequenciaResponse)
-def atualizar_frequencia(frequencia_id: int, dados: FrequenciaUpdate, db: Session = Depends(get_db)):
+def atualizar_frequencia(
+    frequencia_id: int,
+    dados: FrequenciaUpdate,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("frequencias:write")),
+):
     return ServiceFrequencia(db).atualizar(frequencia_id, dados)
 
 
 @router.delete("/{frequencia_id}")
-def deletar_frequencia(frequencia_id: int, db: Session = Depends(get_db)):
+def deletar_frequencia(
+    frequencia_id: int,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("frequencias:write")),
+):
     return ServiceFrequencia(db).deletar(frequencia_id)
