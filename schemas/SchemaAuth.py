@@ -6,6 +6,12 @@ class LoginRequest(BaseModel):
     senha: str = Field(min_length=8, max_length=100)
 
 
+class SetupAdminRequest(BaseModel):
+    nome: str = Field(min_length=3, max_length=100)
+    email: EmailStr
+    senha: str = Field(min_length=8, max_length=100)
+
+
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
