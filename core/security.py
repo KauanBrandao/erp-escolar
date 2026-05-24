@@ -1,25 +1,28 @@
 ﻿from datetime import datetime, timedelta, timezone
 from typing import Optional
 
+import bcrypt
 from jose import JWTError, jwt
-from passlib.context import CryptContext
-from passlib.exc import UnknownHashError
 
 from core.config import settings
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 def gerar_hash_senha(senha: str) -> str:
-    return pwd_context.hash(senha)
+    senha_bytes = senha.encode("utf-8")
+    if len(senha_bytes) > 72:
+        raise ValueError("Senha nao pode ter mais de 72 bytes no bcrypt")
+
+    senha_hash = bcrypt.hashpw(senha_bytes, bcrypt.gensalt())
+    return senha_hash.decode("utf-8")
 
 
 def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
     try:
-        return pwd_context.verify(senha_plana, senha_hash)
-    except (UnknownHashError, ValueError):
+        return bcrypt.checkpw(senha_plana.encode("utf-8"), senha_hash.encode("utf-8"))
+    except ValueError:
         return False
 
 
