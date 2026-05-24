@@ -1,8 +1,11 @@
+﻿import hashlib
+import hmac
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
+from passlib.exc import UnknownHashError
 
 from core.config import settings
 
@@ -15,8 +18,19 @@ def gerar_hash_senha(senha: str) -> str:
     return pwd_context.hash(senha)
 
 
+def _is_legacy_sha256(senha_hash: str) -> bool:
+    return len(senha_hash) == 64 and all(char in "0123456789abcdef" for char in senha_hash.lower())
+
+
 def verificar_senha(senha_plana: str, senha_hash: str) -> bool:
-    return pwd_context.verify(senha_plana, senha_hash)
+    if _is_legacy_sha256(senha_hash):
+        legacy_hash = hashlib.sha256(senha_plana.encode()).hexdigest()
+        return hmac.compare_digest(legacy_hash, senha_hash)
+
+    try:
+        return pwd_context.verify(senha_plana, senha_hash)
+    except (UnknownHashError, ValueError):
+        return False
 
 
 def criar_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
