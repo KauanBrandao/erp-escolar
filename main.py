@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from models.database import Base, engine
+from core.database import Base, engine
 from routers.RouterAluno import router as aluno_router
 from routers.RouterComunicado import router as comunicado_router
 from routers.RouterDisciplina import router as disciplina_router

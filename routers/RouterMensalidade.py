@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from models.database import SessionLocal
+from core.database import SessionLocal
 from schemas.SchemaMensalidade import (MensalidadeCreate, MensalidadeResponse,
                                        MensalidadeUpdate)
 from services.ServiceMensalidade import ServiceMensalidade

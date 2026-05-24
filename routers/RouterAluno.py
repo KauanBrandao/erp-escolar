@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from models.database import SessionLocal
+from core.database import SessionLocal
 from services.ServiceAluno import ServiceAluno
 from schemas.SchemaAluno import AlunoCreate, AlunoResponse, AlunoUpdate
 

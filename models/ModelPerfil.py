@@ -1,4 +1,4 @@
-from .database import Base
+from ..core.database import Base
 from sqlalchemy import Column, Integer, String
 
 class ModelPerfil(Base):
