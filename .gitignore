@@ -3,3 +3,4 @@ venv
 .vscode/
 .postman/
 postman/
+__pycache__/
