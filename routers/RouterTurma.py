@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+﻿from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from core.auth_dependencies import require_permission
 from core.database import SessionLocal
 from services.ServiceTurma import ServiceTurma
 from schemas.SchemaTurma import TurmaCreate, TurmaResponse, TurmaUpdate
@@ -17,25 +18,45 @@ def get_db():
 
 
 @router.post("/", response_model=TurmaResponse, status_code=201)
-def criar_turma(dados: TurmaCreate, db: Session = Depends(get_db)):
+def criar_turma(
+    dados: TurmaCreate,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("turmas:write")),
+):
     return ServiceTurma(db).criar(dados)
 
 
 @router.get("/", response_model=list[TurmaResponse])
-def listar_turmas(db: Session = Depends(get_db)):
+def listar_turmas(
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("turmas:read")),
+):
     return ServiceTurma(db).listar()
 
 
 @router.get("/{turma_id}", response_model=TurmaResponse)
-def buscar_turma(turma_id: int, db: Session = Depends(get_db)):
+def buscar_turma(
+    turma_id: int,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("turmas:read")),
+):
     return ServiceTurma(db).buscar_por_id(turma_id)
 
 
 @router.put("/{turma_id}", response_model=TurmaResponse)
-def atualizar_turma(turma_id: int, dados: TurmaUpdate, db: Session = Depends(get_db)):
+def atualizar_turma(
+    turma_id: int,
+    dados: TurmaUpdate,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("turmas:write")),
+):
     return ServiceTurma(db).atualizar(turma_id, dados)
 
 
 @router.delete("/{turma_id}")
-def deletar_turma(turma_id: int, db: Session = Depends(get_db)):
+def deletar_turma(
+    turma_id: int,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("turmas:write")),
+):
     return ServiceTurma(db).deletar(turma_id)

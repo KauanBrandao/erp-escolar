@@ -1,6 +1,7 @@
-from fastapi import APIRouter, Depends
+﻿from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
+from core.auth_dependencies import require_permission
 from core.database import SessionLocal
 from schemas.SchemaResponsavel import (ResponsavelCreate, ResponsavelResponse,
                                        ResponsavelUpdate)
@@ -18,26 +19,45 @@ def get_db():
 
 
 @router.post("/", response_model=ResponsavelResponse, status_code=201)
-def criar_responsavel(dados: ResponsavelCreate, db: Session = Depends(get_db)):
+def criar_responsavel(
+    dados: ResponsavelCreate,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("responsaveis:write")),
+):
     return ServiceResponsavel(db).criar(dados)
 
 
 @router.get("/", response_model=list[ResponsavelResponse])
-def listar_responsavel(db: Session = Depends(get_db)):
+def listar_responsavel(
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("responsaveis:read")),
+):
     return ServiceResponsavel(db).listar()
 
 
 @router.get("/{responsavel_id}", response_model=ResponsavelResponse)
-def buscar_responsavel(responsavel_id: int, db: Session = Depends(get_db)):
+def buscar_responsavel(
+    responsavel_id: int,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("responsaveis:read")),
+):
     return ServiceResponsavel(db).buscar_por_id(responsavel_id)
 
 
 @router.put("/{responsavel_id}", response_model=ResponsavelResponse)
-def atualizar_responsavel(responsavel_id: int, dados: ResponsavelUpdate, db: Session = Depends(get_db)):
+def atualizar_responsavel(
+    responsavel_id: int,
+    dados: ResponsavelUpdate,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("responsaveis:write")),
+):
     return ServiceResponsavel(db).atualizar(responsavel_id, dados)
 
 
 @router.delete("/{responsavel_id}")
-def deletar_responsavel(responsavel_id: int, db: Session = Depends(get_db)):
+def deletar_responsavel(
+    responsavel_id: int,
+    db: Session = Depends(get_db),
+    _: object = Depends(require_permission("responsaveis:write")),
+):
     return ServiceResponsavel(db).deletar(responsavel_id)
-
