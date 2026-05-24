@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from models.database import SessionLocal
+from core.database import SessionLocal
 from services.ServiceTurma import ServiceTurma
 from schemas.SchemaTurma import TurmaCreate, TurmaResponse, TurmaUpdate
 

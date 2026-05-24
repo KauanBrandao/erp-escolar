@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from domain.UsuarioDominio import criar_usuario_dominio
 from models.ModelPerfil import ModelPerfil
-from models.database import SessionLocal
+from core.database import SessionLocal
 from schemas.SchemaUsuario import UsuarioCreate, UsuarioResponse, UsuarioUpdate
 from services.ServiceUsuario import ServiceUsuario
 

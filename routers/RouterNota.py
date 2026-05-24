@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from models.database import SessionLocal
+from core.database import SessionLocal
 from services.ServiceNota import ServiceNota
 from schemas.SchemaNota import NotaCreate, NotaResponse, NotaUpdate
 

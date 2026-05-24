@@ -1,4 +1,4 @@
-from models.database import Base
+from core.database import Base
 from sqlalchemy import (Boolean, Column, Date, ForeignKey, Integer,
                         String)
 
