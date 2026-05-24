@@ -1,8 +1,8 @@
-import hashlib
-from datetime import date
+﻿from datetime import date
 
 from sqlalchemy.orm import Session
 
+from core.security import gerar_hash_senha
 from models.ModelUsuario import ModelUsuario
 from schemas.SchemaUsuario import UsuarioCreate, UsuarioUpdate
 
@@ -13,7 +13,7 @@ class UsuarioRepository:
 
     def create(self, usuario: UsuarioCreate) -> ModelUsuario:
         dados = usuario.model_dump()
-        senha_hash = hashlib.sha256(dados.pop("senha").encode()).hexdigest()
+        senha_hash = gerar_hash_senha(dados.pop("senha"))
         db_usuario = ModelUsuario(**dados, senha_hash=senha_hash, criado_em=date.today())
         self.db.add(db_usuario)
         self.db.commit()
@@ -22,6 +22,9 @@ class UsuarioRepository:
 
     def get_byID(self, usuario_id: int) -> ModelUsuario | None:
         return self.db.query(ModelUsuario).filter(ModelUsuario.id == usuario_id).first()
+
+    def get_by_email(self, email: str) -> ModelUsuario | None:
+        return self.db.query(ModelUsuario).filter(ModelUsuario.email == email).first()
 
     def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelUsuario]:
         return self.db.query(ModelUsuario).offset(skip).limit(limit).all()
