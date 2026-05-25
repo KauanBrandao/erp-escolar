@@ -1,16 +1,19 @@
-annotated-doc==0.0.4
+﻿annotated-doc==0.0.4
 annotated-types==0.7.0
 anyio==4.13.0
+bcrypt==4.3.0
 click==8.3.1
 fastapi==0.135.2
 h11==0.16.0
 httptools==0.7.1
 idna==3.11
 mysql-connector-python==9.6.0
+passlib[bcrypt]==1.7.4
 pydantic==2.12.5
 pydantic_core==2.41.5
 pydantic-settings==2.13.1
 python-dotenv==1.2.2
+python-jose==3.5.0
 PyYAML==6.0.3
 SQLAlchemy==2.0.48
 starlette==1.0.0
@@ -21,4 +24,4 @@ watchfiles==1.1.1
 websockets==16.0
 
 #python == 3.13.11
-#Tirei o uvloop pois não funciona no windows    
+#Tirei o uvloop pois nao funciona no windows

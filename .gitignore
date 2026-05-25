@@ -4,3 +4,4 @@ venv
 .postman/
 postman/
 __pycache__/
+.venv

@@ -1,4 +1,4 @@
-from models.database import Base
+from core.database import Base
 from sqlalchemy import Column, Integer, String, ForeignKey
 
 class ModelDisciplina(Base):
