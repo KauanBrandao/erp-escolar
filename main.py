@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 
-from models.database import Base, engine
+from core.database import Base, engine
 from routers.RouterAluno import router as aluno_router
+from routers.RouterAuth import router as auth_router
 from routers.RouterComunicado import router as comunicado_router
 from routers.RouterDisciplina import router as disciplina_router
 from routers.RouterFrequencia import router as frequencia_router
@@ -18,6 +19,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="ERP Escolar")
 
+app.include_router(auth_router)
 app.include_router(aluno_router)
 app.include_router(turma_router)
 app.include_router(matricula_router)

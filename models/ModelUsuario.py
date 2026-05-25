@@ -1,4 +1,4 @@
-from models.database import Base
+from core.database import Base
 from sqlalchemy import Column, Integer, String, Date, Boolean, ForeignKey
 
 class ModelUsuario(Base):
