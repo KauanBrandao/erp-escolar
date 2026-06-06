@@ -1,8 +1,66 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Ambientes virtuais
+venv/
+env/
+.venv/
+ENV/
+
+# Variáveis de ambiente (NUNCA versionar)
 .env
-venv
+.env.*
+!.env.example
+
+# ========================
+# Banco de dados
+# ========================
+*.db
+*.sqlite
+*.sqlite3
+
+# ========================
+# Logs
+# ========================
+*.log
+logs/
+
+# ========================
+# IDEs e editores
+# ========================
 .vscode/
-.git
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# ========================
+# Node / Frontend
+# ========================
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# ========================
+# Outros
+# ========================
 .postman/
 postman/
-.gitignore/
-.gitignore
+*.bak
+*.tmp
+.claude/
