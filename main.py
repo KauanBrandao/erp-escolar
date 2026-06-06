@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from models.database import Base, engine
 from routers.RouterAluno import router as aluno_router
@@ -17,6 +18,13 @@ from routers.RouterUsuario import router as user_router
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="ERP Escolar")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(aluno_router)
 app.include_router(turma_router)
