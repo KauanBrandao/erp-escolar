@@ -1,8 +1,9 @@
-from fastapi import FastAPI
+﻿from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from models.database import Base, engine
+from core.database import Base, engine
 from routers.RouterAluno import router as aluno_router
+from routers.RouterAuth import router as auth_router
 from routers.RouterComunicado import router as comunicado_router
 from routers.RouterDisciplina import router as disciplina_router
 from routers.RouterFrequencia import router as frequencia_router
@@ -19,13 +20,19 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="ERP Escolar")
 
+#Configurar para a url do frontend
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+
+
+
+app.include_router(auth_router)
 app.include_router(aluno_router)
 app.include_router(turma_router)
 app.include_router(matricula_router)
@@ -38,3 +45,5 @@ app.include_router(pagamento_router)
 app.include_router(perfil_router)
 app.include_router(responsavel_router)
 app.include_router(user_router)
+
+
