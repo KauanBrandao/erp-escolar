@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ERP Escolar — Sistema de Gestão</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --sidebar-w: 264px;
+  --sidebar-bg: #0c2117;
+  --sidebar-hover: rgba(255,255,255,0.06);
+  --sidebar-active: rgba(212,168,67,0.14);
+  --gold: #d4a843;
+  --gold-light: #f0c96a;
+  --bg: #f0f4f0;
+  --surface: #ffffff;
+  --surface-2: #f7faf7;
+  --border: #e2eae2;
+  --text: #0d1f0d;
+  --text-2: #3a543a;
+  --text-3: #78957a;
+  --green-dark: #0c2117;
+  --green-mid: #2d6a4f;
+  --status-active: #15803d;
+  --status-active-bg: #dcfce7;
+  --status-active-border: #86efac;
+  --status-locked: #b45309;
+  --status-locked-bg: #fef3c7;
+  --status-locked-border: #fcd34d;
+  --status-cancelled: #b91c1c;
+  --status-cancelled-bg: #fee2e2;
+  --status-cancelled-border: #fca5a5;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md: 0 4px 14px rgba(0,0,0,0.08), 0 2px 6px rgba(0,0,0,0.05);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ============ SIDEBAR ============ */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--sidebar-bg);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar::after {
+  content: '';
+  position: absolute;
+  top: -120px;
+  right: -90px;
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(212,168,67,0.12) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.sidebar::before {
+  content: '';
+  position: absolute;
+  bottom: 80px;
+  left: -60px;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(45,106,79,0.3) 0%, transparent 65%);
+  pointer-events: none;
+}
+
+.sidebar-logo {
+  padding: 26px 22px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  z-index: 1;
+}
+
+.logo-mark {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.logo-icon {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--gold), var(--gold-light));
+  border-radius: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Fraunces', serif;
+  font-size: 19px;
+  font-weight: 600;
+  color: #0c2117;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(212,168,67,0.35);
+}
+
+.logo-text { display: flex; flex-direction: column; }
+
+.logo-name {
+  font-family: 'Fraunces', serif;
+  font-size: 16px;
+  font-weight: 400;
+  color: #fff;
+  letter-spacing: 0.01em;
+  line-height: 1.1;
+}
+
+.logo-sub {
+  font-size: 10px;
+  font-weight: 400;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+
+.sidebar-section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.22);
+  padding: 20px 22px 8px;
+  position: relative;
+  z-index: 1;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 8px 10px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  position: relative;
+  z-index: 1;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 11px 13px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.16s ease;
+  color: rgba(255,255,255,0.5);
+  font-size: 13.5px;
+  font-weight: 400;
+  border: none;
+  background: none;
+  width: 100%;
+  text-align: left;
+  font-family: 'Outfit', sans-serif;
+}
+
+.nav-item:hover {
+  background: var(--sidebar-hover);
+  color: rgba(255,255,255,0.82);
+}
+
+.nav-item.active {
+  background: var(--sidebar-active);
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.nav-icon {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.nav-item.active .nav-icon { opacity: 1; }
+
+.nav-badge {
+  margin-left: auto;
+  background: rgba(212,168,67,0.85);
+  color: #0c2117;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+  line-height: 1.5;
+}
+
+.sidebar-footer {
+  padding: 14px 10px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+  z-index: 1;
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  transition: background 0.14s;
+}
+
+.user-card:hover { background: var(--sidebar-hover); }
+
+.user-avatar {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #2d6a4f, #40916c);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.user-info { flex: 1; min-width: 0; }
+
+.user-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.82);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-role {
+  font-size: 11px;
+  color: rgba(255,255,255,0.32);
+  margin-top: 1px;
+}
+
+/* ============ MAIN ============ */
+.main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.topbar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 30px;
+  height: 62px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.topbar-left { display: flex; flex-direction: column; }
+
+.page-title {
+  font-family: 'Fraunces', serif;
+  font-size: 19px;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.page-subtitle {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 1px;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 15px;
+  border-radius: var(--radius-sm);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.14s;
+  border: none;
+}
+
+.btn-primary { background: #0c2117; color: #fff; }
+.btn-primary:hover { background: #1a3d26; }
+.btn-ghost { background: transparent; color: var(--text-2); border: 1px solid var(--border); }
+.btn-ghost:hover { background: var(--surface-2); }
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 26px 30px;
+}
+
+/* ============ STAT CARDS ============ */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.stat-card.c-dark::before { background: linear-gradient(90deg, #0c2117, #2d6a4f); }
+.stat-card.c-green::before { background: linear-gradient(90deg, #16a34a, #4ade80); }
+.stat-card.c-amber::before { background: linear-gradient(90deg, #d97706, #fbbf24); }
+.stat-card.c-red::before { background: linear-gradient(90deg, #dc2626, #f87171); }
+.stat-card.c-blue::before { background: linear-gradient(90deg, #2563eb, #60a5fa); }
+
+.stat-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-family: 'Fraunces', serif;
+  font-size: 34px;
+  font-weight: 300;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-change {
+  font-size: 12px;
+  color: var(--text-3);
+  margin-top: 6px;
+}
+.stat-change.up { color: #15803d; }
+.stat-change.down { color: #b91c1c; }
+
+/* ============ FILTER BAR ============ */
+.filter-bar {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 200px;
+  max-width: 340px;
+}
+
+.search-icon {
+  position: absolute;
+  left: 11px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 15px;
+  height: 15px;
+  color: var(--text-3);
+}
+
+.search-input {
+  width: 100%;
+  padding: 9px 11px 9px 36px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.14s;
+}
+
+.search-input:focus { border-color: #2d6a4f; }
+.search-input::placeholder { color: var(--text-3); }
+
+.filter-select {
+  padding: 9px 11px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  cursor: pointer;
+}
+
+/* ============ TABLE CARD ============ */
+.table-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.table-header {
+  padding: 14px 22px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-title { font-size: 14px; font-weight: 600; color: var(--text); }
+.table-count { font-size: 12px; color: var(--text-3); margin-top: 1px; }
+
+table { width: 100%; border-collapse: collapse; }
+
+thead th {
+  padding: 10px 18px;
+  text-align: left;
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--text-3);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+tbody tr { transition: background 0.11s; }
+tbody tr:hover { background: #f6f9f6; }
+tbody tr:not(:last-child) { border-bottom: 1px solid var(--border); }
+
+tbody td {
+  padding: 12px 18px;
+  font-size: 13px;
+  color: var(--text-2);
+}
+
+.td-primary { font-weight: 500; color: var(--text) !important; }
+
+/* ============ BADGES ============ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 11.5px;
+  font-weight: 500;
+  border: 1px solid transparent;
+  white-space: nowrap;
+}
+
+.badge::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.badge-active { background: var(--status-active-bg); color: var(--status-active); border-color: var(--status-active-border); }
+.badge-active::before { background: var(--status-active); }
+.badge-locked { background: var(--status-locked-bg); color: var(--status-locked); border-color: var(--status-locked-border); }
+.badge-locked::before { background: var(--status-locked); }
+.badge-cancelled { background: var(--status-cancelled-bg); color: var(--status-cancelled); border-color: var(--status-cancelled-border); }
+.badge-cancelled::before { background: var(--status-cancelled); }
+.badge-paid { background: #dcfce7; color: #15803d; border-color: #86efac; }
+.badge-paid::before { background: #15803d; }
+.badge-pending { background: #fef3c7; color: #b45309; border-color: #fcd34d; }
+.badge-pending::before { background: #b45309; }
+.badge-late { background: #fee2e2; color: #b91c1c; border-color: #fca5a5; }
+.badge-late::before { background: #b91c1c; }
+.badge-grey { background: #f3f4f6; color: #6b7280; border-color: #d1d5db; }
+.badge-grey::before { background: #9ca3af; }
+.badge-blue { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; }
+.badge-blue::before { background: #2563eb; }
+
+/* ============ ACTION BUTTONS ============ */
+.action-btn {
+  padding: 4px 9px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-2);
+  transition: all 0.11s;
+  margin-right: 3px;
+  font-family: 'Outfit', sans-serif;
+}
+
+.action-btn:hover { background: var(--surface-2); border-color: #b0c8b0; }
+.action-btn.danger:hover { background: #fee2e2; border-color: #fca5a5; color: #b91c1c; }
+
+/* ============ SCREENS ============ */
+.screen { display: none; }
+.screen.active { display: block; animation: fadeIn 0.18s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============ TURMAS ============ */
+.turmas-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.panel-title {
+  font-family: 'Fraunces', serif;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.turmas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 11px;
+}
+
+.turma-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 17px 18px;
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--border);
+  cursor: pointer;
+  transition: all 0.16s;
+}
+
+.turma-card:hover { border-color: #2d6a4f; box-shadow: var(--shadow-md); }
+.turma-card.selected { border-color: var(--gold); background: #fffdf5; }
+
+.turma-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.turma-serie {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1;
+}
+
+.turma-turn-badge {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 5px;
+  background: #e8f5e9;
+  color: #2d6a4f;
+}
+
+.turma-info {
+  font-size: 11.5px;
+  color: var(--text-3);
+  display: flex;
+  gap: 12px;
+}
+
+.turma-stat { display: flex; align-items: center; gap: 4px; }
+
+.disciplinas-panel {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  min-height: 380px;
+}
+
+.disc-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border);
+}
+.disc-item:last-child { border-bottom: none; }
+.disc-name { font-size: 13.5px; font-weight: 500; color: var(--text); }
+.disc-code { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.disc-hours { font-size: 12.5px; color: var(--text-2); }
+
+.placeholder-text {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  color: var(--text-3);
+  font-size: 13.5px;
+}
+
+/* ============ BOLETIM ============ */
+.boletim-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 22px;
+  align-items: center;
+}
+
+.student-select {
+  padding: 9px 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  font-family: 'Outfit', sans-serif;
+  font-size: 13.5px;
+  color: var(--text);
+  background: var(--surface);
+  outline: none;
+  cursor: pointer;
+  min-width: 300px;
+}
+.student-select:focus { border-color: #2d6a4f; }
+
+.grade-table-wrap {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  overflow: auto;
+}
+
+.grade-table { min-width: 820px; }
+.grade-table thead th { text-align: center; }
+.grade-table thead th:first-child { text-align: left; min-width: 155px; }
+.grade-table tbody td { text-align: center; }
+.grade-table tbody td:first-child { text-align: left; font-weight: 500; color: var(--text); }
+
+.grade-cell { font-size: 13px; font-weight: 500; }
+.grade-good { color: #15803d; }
+.grade-ok { color: #b45309; }
+.grade-bad { color: #b91c1c; }
+.grade-na { color: var(--text-3); font-style: italic; font-size: 12px; }
+.grade-avg { font-weight: 700 !important; font-size: 14px; }
+
+.freq-bar-wrap { display: flex; align-items: center; gap: 7px; justify-content: center; }
+.freq-bar { width: 52px; height: 5px; background: #e4ebe4; border-radius: 3px; overflow: hidden; }
+.freq-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, #16a34a, #4ade80); }
+.freq-fill.mid { background: linear-gradient(90deg, #d97706, #fbbf24); }
+.freq-fill.low { background: linear-gradient(90deg, #dc2626, #f87171); }
+
+/* ============ FINANCEIRO ============ */
+.fin-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 15px;
+  margin-bottom: 22px;
+}
+
+.fin-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+}
+
+.fin-card-label {
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-3);
+  margin-bottom: 10px;
+}
+
+.fin-card-value {
+  font-family: 'Fraunces', serif;
+  font-size: 28px;
+  font-weight: 300;
+  color: var(--text);
+}
+.fin-card-value span { font-size: 14px; font-weight: 400; margin-right: 3px; }
+.fin-card-sub { font-size: 12px; color: var(--text-3); margin-top: 6px; }
+
+/* ============ COMUNICADOS ============ */
+.comunicados-grid { display: flex; flex-direction: column; gap: 11px; }
+
+.comunicado-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 18px 22px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  border-left: 4px solid transparent;
+  transition: box-shadow 0.14s;
+}
+
+.comunicado-card.com-active { border-left-color: #16a34a; }
+.comunicado-card.com-inactive { border-left-color: #d1d5db; }
+.comunicado-card:hover { box-shadow: var(--shadow-md); }
+
+.comunicado-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  gap: 12px;
+}
+
+.comunicado-title { font-size: 14.5px; font-weight: 600; color: var(--text); }
+.comunicado-body { font-size: 13px; color: var(--text-2); line-height: 1.6; }
+
+.comunicado-meta {
+  font-size: 12px;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.comunicado-meta span { display: flex; align-items: center; gap: 4px; }
+
+/* ============ SCROLLBAR ============ */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #c4d4c4; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #a0b8a0; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">E</div>
+      <div class="logo-text">
+        <span class="logo-name">ERP Escolar</span>
+        <span class="logo-sub">Gestão Educacional</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar-section-label">Módulos</div>
+
+  <nav class="sidebar-nav">
+    <button class="nav-item active" onclick="navigate('alunos', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+        <circle cx="9" cy="7" r="4"/>
+        <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+        <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      </svg>
+      Alunos &amp; Matrículas
+      <span class="nav-badge">230</span>
+    </button>
+
+    <button class="nav-item" onclick="navigate('turmas', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+      Turmas &amp; Disciplinas
+    </button>
+
+    <button class="nav-item" onclick="navigate('boletim', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+      Boletim &amp; Frequência
+    </button>
+
+    <button class="nav-item" onclick="navigate('financeiro', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+        <line x1="1" y1="10" x2="23" y2="10"/>
+      </svg>
+      Financeiro
+      <span class="nav-badge">12</span>
+    </button>
+
+    <button class="nav-item" onclick="navigate('comunicados', this)">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+      Comunicados
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">MS</div>
+      <div class="user-info">
+        <div class="user-name">Maria Santos</div>
+        <div class="user-role">Administrador</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="page-title" id="pageTitle">Alunos &amp; Matrículas</div>
+      <div class="page-subtitle" id="pageSubtitle">Gerenciamento de alunos e matrículas ativas</div>
+    </div>
+    <div class="topbar-actions" id="topbarActions"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- ====== SCREEN: ALUNOS ====== -->
+    <div class="screen active" id="screen-alunos">
+      <div class="stats-grid">
+        <div class="stat-card c-dark">
+          <div class="stat-label">Total de Alunos</div>
+          <div class="stat-value">230</div>
+          <div class="stat-change up">↑ +8 este mês</div>
+        </div>
+        <div class="stat-card c-green">
+          <div class="stat-label">Matrículas Ativas</div>
+          <div class="stat-value">198</div>
+          <div class="stat-change">86% do total</div>
+        </div>
+        <div class="stat-card c-amber">
+          <div class="stat-label">Trancadas</div>
+          <div class="stat-value">22</div>
+          <div class="stat-change">9,6% do total</div>
+        </div>
+        <div class="stat-card c-red">
+          <div class="stat-label">Canceladas</div>
+          <div class="stat-value">10</div>
+          <div class="stat-change down">↑ +2 este mês</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" type="text" placeholder="Buscar aluno, CPF ou responsável...">
+        </div>
+        <select class="filter-select">
+          <option>Todos os status</option>
+          <option>Ativa</option>
+          <option>Trancada</option>
+          <option>Cancelada</option>
+        </select>
+        <select class="filter-select">
+          <option>Todas as turmas</option>
+          <option>6° Ano A</option>
+          <option>6° Ano B</option>
+          <option>7° Ano A</option>
+          <option>7° Ano B</option>
+          <option>8° Ano A</option>
+          <option>8° Ano B</option>
+          <option>9° Ano A</option>
+          <option>9° Ano B</option>
+        </select>
+        <select class="filter-select">
+          <option>Turno: Todos</option>
+          <option>Manhã</option>
+          <option>Tarde</option>
+        </select>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <div class="table-title">Lista de Alunos</div>
+            <div class="table-count">Exibindo 10 de 230 alunos</div>
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Nº Matrícula</th>
+              <th>Turma</th>
+              <th>Turno</th>
+              <th>Responsável</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="alunos-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== SCREEN: TURMAS ====== -->
+    <div class="screen" id="screen-turmas">
+      <div class="stats-grid">
+        <div class="stat-card c-dark">
+          <div class="stat-label">Total de Turmas</div>
+          <div class="stat-value">8</div>
+          <div class="stat-change">Ano letivo 2025</div>
+        </div>
+        <div class="stat-card c-green">
+          <div class="stat-label">Turno Manhã</div>
+          <div class="stat-value">4</div>
+          <div class="stat-change">121 alunos</div>
+        </div>
+        <div class="stat-card c-blue">
+          <div class="stat-label">Turno Tarde</div>
+          <div class="stat-value">4</div>
+          <div class="stat-change">109 alunos</div>
+        </div>
+        <div class="stat-card c-amber">
+          <div class="stat-label">Disciplinas Ativas</div>
+          <div class="stat-value">8</div>
+          <div class="stat-change">por turma</div>
+        </div>
+      </div>
+
+      <div class="turmas-layout">
+        <div>
+          <p class="panel-title">Turmas — 2025</p>
+          <div class="turmas-grid" id="turmas-grid"></div>
+        </div>
+        <div>
+          <p class="panel-title">Disciplinas da Turma</p>
+          <div class="disciplinas-panel" id="disciplinas-panel">
+            <div class="placeholder-text">Selecione uma turma ao lado para ver as disciplinas</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== SCREEN: BOLETIM ====== -->
+    <div class="screen" id="screen-boletim">
+      <div class="boletim-controls">
+        <select class="student-select" id="student-select" onchange="renderBoletim()"></select>
+        <select class="filter-select">
+          <option>Ano letivo: 2025</option>
+          <option>2024</option>
+          <option>2023</option>
+        </select>
+        <button class="btn btn-ghost">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar PDF
+        </button>
+      </div>
+      <div id="boletim-content"></div>
+    </div>
+
+    <!-- ====== SCREEN: FINANCEIRO ====== -->
+    <div class="screen" id="screen-financeiro">
+      <div class="fin-summary">
+        <div class="fin-card">
+          <div class="fin-card-label">Total a Receber</div>
+          <div class="fin-card-value"><span>R$</span>34.500,00</div>
+          <div class="fin-card-sub">Mensalidades de Abril/2025</div>
+        </div>
+        <div class="fin-card">
+          <div class="fin-card-label">Total Recebido</div>
+          <div class="fin-card-value" style="color:#15803d"><span>R$</span>27.850,00</div>
+          <div class="fin-card-sub" style="color:#15803d">80,7% arrecadado</div>
+        </div>
+        <div class="fin-card">
+          <div class="fin-card-label">Inadimplência</div>
+          <div class="fin-card-value" style="color:#b91c1c"><span>R$</span>6.650,00</div>
+          <div class="fin-card-sub" style="color:#b91c1c">12 alunos em atraso</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" type="text" placeholder="Buscar aluno ou responsável...">
+        </div>
+        <select class="filter-select">
+          <option>Abril / 2025</option>
+          <option>Março / 2025</option>
+          <option>Fevereiro / 2025</option>
+          <option>Janeiro / 2025</option>
+        </select>
+        <select class="filter-select">
+          <option>Todos os status</option>
+          <option>Pago</option>
+          <option>Pendente</option>
+          <option>Atrasado</option>
+        </select>
+      </div>
+
+      <div class="table-card">
+        <div class="table-header">
+          <div>
+            <div class="table-title">Mensalidades — Abril 2025</div>
+            <div class="table-count">Exibindo 10 registros</div>
+          </div>
+          <button class="btn btn-primary">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Gerar Boletos
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Aluno</th>
+              <th>Turma</th>
+              <th>Vencimento</th>
+              <th>Valor</th>
+              <th>Forma de Pag.</th>
+              <th>Data do Pag.</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="financeiro-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ====== SCREEN: COMUNICADOS ====== -->
+    <div class="screen" id="screen-comunicados">
+      <div class="stats-grid">
+        <div class="stat-card c-dark">
+          <div class="stat-label">Total Enviados</div>
+          <div class="stat-value">47</div>
+          <div class="stat-change">em 2025</div>
+        </div>
+        <div class="stat-card c-green">
+          <div class="stat-label">Ativos</div>
+          <div class="stat-value">5</div>
+          <div class="stat-change">em exibição</div>
+        </div>
+        <div class="stat-card c-amber">
+          <div class="stat-label">Este Mês</div>
+          <div class="stat-value">5</div>
+          <div class="stat-change">Abril/2025</div>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" type="text" placeholder="Buscar comunicado...">
+        </div>
+        <select class="filter-select">
+          <option>Todos os status</option>
+          <option>Ativo</option>
+          <option>Inativo</option>
+        </select>
+        <select class="filter-select">
+          <option>Todos os destinatários</option>
+          <option>Todos os usuários</option>
+          <option>Professores</option>
+          <option>Administração</option>
+        </select>
+      </div>
+
+      <div class="comunicados-grid" id="comunicados-list"></div>
+    </div>
+
+  </div><!-- /content -->
+</main>
+
+<script>
+// ================================================================
+// DADOS MOCKADOS
+// ================================================================
+
+const alunos = [
+  { id:1, nome:'Ana Clara Ferreira Silva',    matricula:'2025001', turma:'9° Ano A', turno:'Manhã',  responsavel:'Roberto Ferreira',  status:'ativa'     },
+  { id:2, nome:'Bruno Henrique Costa',         matricula:'2025002', turma:'8° Ano B', turno:'Tarde',  responsavel:'Luciana Costa',     status:'ativa'     },
+  { id:3, nome:'Carolina Souza Martins',       matricula:'2025003', turma:'7° Ano A', turno:'Manhã',  responsavel:'Paulo Souza',       status:'trancada'  },
+  { id:4, nome:'Diego Alves Ribeiro',          matricula:'2025004', turma:'9° Ano B', turno:'Tarde',  responsavel:'Sônia Alves',       status:'ativa'     },
+  { id:5, nome:'Eduarda Lima Pereira',         matricula:'2025005', turma:'6° Ano A', turno:'Manhã',  responsavel:'Carlos Lima',       status:'cancelada' },
+  { id:6, nome:'Felipe Santos Oliveira',       matricula:'2025006', turma:'8° Ano A', turno:'Manhã',  responsavel:'Fernanda Santos',   status:'ativa'     },
+  { id:7, nome:'Gabriela Nunes Carvalho',      matricula:'2025007', turma:'7° Ano B', turno:'Tarde',  responsavel:'José Nunes',        status:'ativa'     },
+  { id:8, nome:'Henrique Moraes Silva',        matricula:'2025008', turma:'9° Ano A', turno:'Manhã',  responsavel:'Beatriz Moraes',    status:'trancada'  },
+  { id:9, nome:'Isabella Rodrigues Costa',     matricula:'2025009', turma:'6° Ano B', turno:'Tarde',  responsavel:'Marcos Rodrigues',  status:'ativa'     },
+  { id:10,nome:'João Pedro Araújo Lima',       matricula:'2025010', turma:'8° Ano B', turno:'Tarde',  responsavel:'Cláudia Araújo',    status:'ativa'     },
+];
+
+const turmas = [
+  { id:1, serie:'6° Ano A', turno:'Manhã', ano:2025, alunos:28 },
+  { id:2, serie:'6° Ano B', turno:'Tarde', ano:2025, alunos:25 },
+  { id:3, serie:'7° Ano A', turno:'Manhã', ano:2025, alunos:30 },
+  { id:4, serie:'7° Ano B', turno:'Tarde', ano:2025, alunos:27 },
+  { id:5, serie:'8° Ano A', turno:'Manhã', ano:2025, alunos:32 },
+  { id:6, serie:'8° Ano B', turno:'Tarde', ano:2025, alunos:29 },
+  { id:7, serie:'9° Ano A', turno:'Manhã', ano:2025, alunos:31 },
+  { id:8, serie:'9° Ano B', turno:'Tarde', ano:2025, alunos:28 },
+];
+
+const disciplinas = [
+  { nome:'Matemática',       codigo:'MAT001', ch:120 },
+  { nome:'Língua Portuguesa',codigo:'POR001', ch:120 },
+  { nome:'Ciências',         codigo:'CIE001', ch:80  },
+  { nome:'História',         codigo:'HIS001', ch:80  },
+  { nome:'Geografia',        codigo:'GEO001', ch:80  },
+  { nome:'Inglês',           codigo:'ING001', ch:60  },
+  { nome:'Educação Física',  codigo:'EDF001', ch:60  },
+  { nome:'Arte',             codigo:'ART001', ch:40  },
+];
+
+const notasData = {
+  1: [
+    { disc:'Matemática',       p1:7.5,t1:8.0,r1:null, p2:6.0,t2:7.0,r2:7.5,  p3:8.5,t3:9.0,r3:null, p4:7.0,t4:8.0,r4:null, media:7.6, freq:92 },
+    { disc:'Língua Portuguesa',p1:8.5,t1:9.0,r1:null, p2:8.0,t2:8.5,r2:null, p3:9.0,t3:9.5,r3:null, p4:8.5,t4:9.0,r4:null, media:8.8, freq:95 },
+    { disc:'Ciências',         p1:7.0,t1:7.5,r1:null, p2:6.5,t2:7.0,r2:null, p3:7.5,t3:8.0,r3:null, p4:7.0,t4:7.5,r4:null, media:7.3, freq:88 },
+    { disc:'História',         p1:9.0,t1:8.5,r1:null, p2:8.5,t2:9.0,r2:null, p3:9.5,t3:9.0,r3:null, p4:9.0,t4:8.5,r4:null, media:9.0, freq:97 },
+    { disc:'Geografia',        p1:6.5,t1:7.0,r1:null, p2:5.5,t2:6.0,r2:6.5,  p3:7.0,t3:7.5,r3:null, p4:6.5,t4:7.0,r4:null, media:6.7, freq:85 },
+    { disc:'Inglês',           p1:8.0,t1:8.5,r1:null, p2:7.5,t2:8.0,r2:null, p3:8.5,t3:9.0,r3:null, p4:8.0,t4:8.5,r4:null, media:8.3, freq:93 },
+    { disc:'Educação Física',  p1:9.5,t1:10. ,r1:null,p2:9.0,t2:9.5,r2:null, p3:10.,t3:10. ,r3:null, p4:9.5,t4:9.5,r4:null, media:9.8, freq:98 },
+    { disc:'Arte',             p1:8.5,t1:9.0,r1:null, p2:8.0,t2:8.5,r2:null, p3:9.0,t3:9.5,r3:null, p4:8.5,t4:9.0,r4:null, media:8.8, freq:94 },
+  ],
+  2: [
+    { disc:'Matemática',       p1:5.5,t1:6.0,r1:6.5, p2:5.0,t2:5.5,r2:6.0,  p3:6.5,t3:7.0,r3:null, p4:6.0,t4:6.5,r4:null, media:6.1, freq:78 },
+    { disc:'Língua Portuguesa',p1:7.0,t1:7.5,r1:null, p2:6.5,t2:7.0,r2:null, p3:7.5,t3:8.0,r3:null, p4:7.0,t4:7.5,r4:null, media:7.3, freq:82 },
+    { disc:'Ciências',         p1:6.0,t1:6.5,r1:null, p2:5.5,t2:6.0,r2:6.5,  p3:6.5,t3:7.0,r3:null, p4:6.0,t4:6.5,r4:null, media:6.3, freq:80 },
+    { disc:'História',         p1:7.5,t1:8.0,r1:null, p2:7.0,t2:7.5,r2:null, p3:8.0,t3:8.5,r3:null, p4:7.5,t4:8.0,r4:null, media:7.8, freq:86 },
+    { disc:'Geografia',        p1:5.0,t1:5.5,r1:6.0, p2:4.5,t2:5.0,r2:5.5,  p3:5.5,t3:6.0,r3:null, p4:5.0,t4:5.5,r4:null, media:5.4, freq:74 },
+    { disc:'Inglês',           p1:6.5,t1:7.0,r1:null, p2:6.0,t2:6.5,r2:null, p3:7.0,t3:7.5,r3:null, p4:6.5,t4:7.0,r4:null, media:6.8, freq:83 },
+    { disc:'Educação Física',  p1:8.5,t1:9.0,r1:null, p2:8.0,t2:8.5,r2:null, p3:9.0,t3:9.5,r3:null, p4:8.5,t4:9.0,r4:null, media:8.8, freq:91 },
+    { disc:'Arte',             p1:7.5,t1:8.0,r1:null, p2:7.0,t2:7.5,r2:null, p3:8.0,t3:8.5,r3:null, p4:7.5,t4:8.0,r4:null, media:7.8, freq:89 },
+  ],
+  3: [
+    { disc:'Matemática',       p1:4.0,t1:5.0,r1:5.5, p2:4.5,t2:5.0,r2:5.5,  p3:null,t3:null,r3:null,p4:null,t4:null,r4:null,media:4.9, freq:62 },
+    { disc:'Língua Portuguesa',p1:6.0,t1:6.5,r1:null, p2:5.5,t2:6.0,r2:null, p3:null,t3:null,r3:null,p4:null,t4:null,r4:null,media:6.0, freq:65 },
+    { disc:'Ciências',         p1:5.5,t1:6.0,r1:null, p2:5.0,t2:5.5,r2:6.0,  p3:null,t3:null,r3:null,p4:null,t4:null,r4:null,media:5.6, freq:60 },
+    { disc:'História',         p1:6.5,t1:7.0,r1:null, p2:6.0,t2:6.5,r2:null, p3:null,t3:null,r3:null,p4:null,t4:null,r4:null,media:6.5, freq:68 },
+    { disc:'Geografia',        p1:5.0,t1:5.5,r1:6.0, p2:4.0,t2:4.5,r2:5.0,  p3:null,t3:null,r3:null,p4:null,t4:null,r4:null,media:5.0, freq:58 },
+    { disc:'Inglês',           p1:5.5,t1:6.0,r1:null, p2:5.0,t2:5.5,r2:null, p3:null,t3:null,r3:null,p4:null,t4:null,r4:null,media:5.5, freq:62 },
+    { disc:'Educação Física',  p1:7.5,t1:8.0,r1:null, p2:7.0,t2:7.5,r2:null, p3:null,t3:null,r3:null,p4:null,t4:null,r4:null,media:7.5, freq:70 },
+    { disc:'Arte',             p1:7.0,t1:7.5,r1:null, p2:6.5,t2:7.0,r2:null, p3:null,t3:null,r3:null,p4:null,t4:null,r4:null,media:7.0, freq:65 },
+  ],
+};
+
+const mensalidades = [
+  { aluno:'Ana Clara Ferreira Silva',   turma:'9° Ano A', vencimento:'10/04/2025', valor:'R$ 950,00', formaPag:'PIX',               dataPag:'08/04/2025', status:'pago'     },
+  { aluno:'Bruno Henrique Costa',        turma:'8° Ano B', vencimento:'10/04/2025', valor:'R$ 950,00', formaPag:'Cartão de Crédito', dataPag:'10/04/2025', status:'pago'     },
+  { aluno:'Carolina Souza Martins',      turma:'7° Ano A', vencimento:'10/04/2025', valor:'R$ 850,00', formaPag:'—',                 dataPag:'—',          status:'pendente' },
+  { aluno:'Diego Alves Ribeiro',         turma:'9° Ano B', vencimento:'10/04/2025', valor:'R$ 950,00', formaPag:'Boleto',            dataPag:'12/04/2025', status:'pago'     },
+  { aluno:'Eduarda Lima Pereira',        turma:'6° Ano A', vencimento:'10/04/2025', valor:'R$ 750,00', formaPag:'—',                 dataPag:'—',          status:'atrasado' },
+  { aluno:'Felipe Santos Oliveira',      turma:'8° Ano A', vencimento:'10/04/2025', valor:'R$ 950,00', formaPag:'PIX',               dataPag:'09/04/2025', status:'pago'     },
+  { aluno:'Gabriela Nunes Carvalho',     turma:'7° Ano B', vencimento:'10/04/2025', valor:'R$ 850,00', formaPag:'Transferência',     dataPag:'11/04/2025', status:'pago'     },
+  { aluno:'Henrique Moraes Silva',       turma:'9° Ano A', vencimento:'10/04/2025', valor:'R$ 950,00', formaPag:'—',                 dataPag:'—',          status:'atrasado' },
+  { aluno:'Isabella Rodrigues Costa',    turma:'6° Ano B', vencimento:'10/04/2025', valor:'R$ 750,00', formaPag:'PIX',               dataPag:'07/04/2025', status:'pago'     },
+  { aluno:'João Pedro Araújo Lima',      turma:'8° Ano B', vencimento:'10/04/2025', valor:'R$ 950,00', formaPag:'—',                 dataPag:'—',          status:'pendente' },
+];
+
+const comunicados = [
+  {
+    titulo: 'Reunião de Pais e Mestres — 1° Bimestre',
+    corpo: 'Convidamos todos os pais e responsáveis para a reunião de pais e mestres referente ao 1° Bimestre de 2025. O evento acontecerá no dia 15 de maio, às 19h, no auditório da escola. A presença é fundamental para acompanhar o desempenho dos alunos.',
+    destinatario: 'Todos os Usuários',
+    data: '25/04/2025',
+    autor: 'Maria Santos',
+    status: 'ativo',
+  },
+  {
+    titulo: 'Calendário de Provas — 2° Bimestre',
+    corpo: 'Informamos que o calendário de provas do 2° Bimestre já está disponível no sistema. As avaliações ocorrerão entre os dias 02 e 13 de junho de 2025. Solicitamos que os professores cadastrem as notas em até 5 dias úteis após a realização.',
+    destinatario: 'Professores',
+    data: '22/04/2025',
+    autor: 'Coordenação Pedagógica',
+    status: 'ativo',
+  },
+  {
+    titulo: 'Feriado — Dia do Trabalho',
+    corpo: 'Comunicamos que no dia 01 de maio de 2025 (quinta-feira) não haverá aulas em virtude do Feriado Nacional do Dia do Trabalho. As atividades serão retomadas normalmente na sexta-feira, dia 02 de maio.',
+    destinatario: 'Todos os Usuários',
+    data: '18/04/2025',
+    autor: 'Direção',
+    status: 'ativo',
+  },
+  {
+    titulo: 'Manutenção do Sistema — 30/04',
+    corpo: 'O sistema estará em manutenção programada no dia 30/04/2025 das 22h às 02h. Durante esse período, o acesso ao ERP Escolar estará temporariamente indisponível. Pedimos que salve todos os dados antes do horário indicado.',
+    destinatario: 'Administração',
+    data: '15/04/2025',
+    autor: 'TI — Suporte',
+    status: 'ativo',
+  },
+  {
+    titulo: 'Encerramento do 1° Bimestre',
+    corpo: 'O 1° Bimestre de 2025 foi encerrado. Todas as notas e frequências devem ser finalizadas no sistema até o dia 28/04. Após essa data o sistema bloqueará edições para o período.',
+    destinatario: 'Professores',
+    data: '10/04/2025',
+    autor: 'Coordenação Pedagógica',
+    status: 'ativo',
+  },
+  {
+    titulo: 'Atualização das Fotos dos Alunos',
+    corpo: 'Solicitamos que todos os alunos apresentem foto 3x4 atualizada na secretaria para atualização do cadastro. O prazo encerrou no dia 30 de março de 2025.',
+    destinatario: 'Todos os Usuários',
+    data: '05/04/2025',
+    autor: 'Secretaria',
+    status: 'inativo',
+  },
+];
+
+// ================================================================
+// TOPBAR CONFIG
+// ================================================================
+
+const screenConfig = {
+  alunos: {
+    title: 'Alunos &amp; Matrículas',
+    subtitle: 'Gerenciamento de alunos e matrículas ativas',
+    actions: `
+      <button class="btn btn-ghost"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar</button>
+      <button class="btn btn-primary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Aluno</button>`
+  },
+  turmas: {
+    title: 'Turmas &amp; Disciplinas',
+    subtitle: 'Organização acadêmica por turma e disciplina',
+    actions: `<button class="btn btn-primary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nova Turma</button>`
+  },
+  boletim: {
+    title: 'Boletim &amp; Frequência',
+    subtitle: 'Consulta de notas e frequência por aluno',
+    actions: `<button class="btn btn-ghost"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar Boletins</button>`
+  },
+  financeiro: {
+    title: 'Financeiro',
+    subtitle: 'Mensalidades e pagamentos — Abril 2025',
+    actions: `
+      <button class="btn btn-ghost"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Exportar</button>
+      <button class="btn btn-primary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Nova Mensalidade</button>`
+  },
+  comunicados: {
+    title: 'Comunicados',
+    subtitle: 'Gerenciamento de avisos e comunicados internos',
+    actions: `<button class="btn btn-primary"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Novo Comunicado</button>`
+  },
+};
+
+// ================================================================
+// NAVIGATION
+// ================================================================
+
+function navigate(screen, el) {
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  const cfg = screenConfig[screen];
+  document.getElementById('pageTitle').innerHTML = cfg.title;
+  document.getElementById('pageSubtitle').textContent = cfg.subtitle;
+  document.getElementById('topbarActions').innerHTML = cfg.actions;
+}
+
+// ================================================================
+// HELPERS
+// ================================================================
+
+function statusBadge(status) {
+  const map = {
+    ativa:     ['badge-active',    'Ativa'],
+    trancada:  ['badge-locked',    'Trancada'],
+    cancelada: ['badge-cancelled', 'Cancelada'],
+    pago:      ['badge-paid',      'Pago'],
+    pendente:  ['badge-pending',   'Pendente'],
+    atrasado:  ['badge-late',      'Atrasado'],
+    ativo:     ['badge-active',    'Ativo'],
+    inativo:   ['badge-grey',      'Inativo'],
+  };
+  const [cls, label] = map[status] || ['badge-grey', status];
+  return `<span class="badge ${cls}">${label}</span>`;
+}
+
+function gradeClass(g) {
+  if (g === null) return 'grade-na';
+  if (g >= 7) return 'grade-good';
+  if (g >= 5) return 'grade-ok';
+  return 'grade-bad';
+}
+
+function gradeDisplay(g) {
+  return g === null ? '—' : g.toFixed(1);
+}
+
+// ================================================================
+// RENDER: ALUNOS
+// ================================================================
+
+function renderAlunos() {
+  document.getElementById('alunos-tbody').innerHTML = alunos.map(a => `
+    <tr>
+      <td class="td-primary">${a.nome}</td>
+      <td><span style="font-size:12px;color:var(--text-3);font-family:monospace">${a.matricula}</span></td>
+      <td>${a.turma}</td>
+      <td>${a.turno}</td>
+      <td>${a.responsavel}</td>
+      <td>${statusBadge(a.status)}</td>
+      <td>
+        <button class="action-btn">Ver</button>
+        <button class="action-btn">Editar</button>
+        <button class="action-btn danger">Excluir</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// ================================================================
+// RENDER: TURMAS
+// ================================================================
+
+let selectedTurmaId = null;
+
+function renderTurmas() {
+  document.getElementById('turmas-grid').innerHTML = turmas.map(t => `
+    <div class="turma-card ${selectedTurmaId === t.id ? 'selected' : ''}" onclick="selectTurma(${t.id})">
+      <div class="turma-card-header">
+        <div class="turma-serie">${t.serie}</div>
+        <span class="turma-turn-badge">${t.turno}</span>
+      </div>
+      <div class="turma-info">
+        <span class="turma-stat">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+          ${t.alunos} alunos
+        </span>
+        <span class="turma-stat">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${t.ano}
+        </span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectTurma(id) {
+  selectedTurmaId = id;
+  renderTurmas();
+  const t = turmas.find(x => x.id === id);
+  document.getElementById('disciplinas-panel').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div>
+        <div style="font-weight:600;font-size:15px;color:var(--text)">${t.serie}</div>
+        <div style="font-size:12px;color:var(--text-3);margin-top:2px">${t.turno} · ${t.ano} · ${t.alunos} alunos</div>
+      </div>
+      <button class="btn btn-ghost" style="font-size:12px;padding:6px 11px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Adicionar
+      </button>
+    </div>
+    ${disciplinas.map(d => `
+      <div class="disc-item">
+        <div>
+          <div class="disc-name">${d.nome}</div>
+          <div class="disc-code">${d.codigo}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:9px">
+          <span class="disc-hours">${d.ch}h</span>
+          <button class="action-btn">Editar</button>
+        </div>
+      </div>
+    `).join('')}
+  `;
+}
+
+// ================================================================
+// RENDER: BOLETIM
+// ================================================================
+
+function initBoletim() {
+  const sel = document.getElementById('student-select');
+  sel.innerHTML = alunos.map(a => `<option value="${a.id}">${a.nome} — ${a.turma}</option>`).join('');
+  renderBoletim();
+}
+
+function renderBoletim() {
+  const id = parseInt(document.getElementById('student-select').value);
+  const sn = notasData[id] || notasData[1];
+  const avgGeral = (sn.reduce((s,n)=>s+n.media,0)/sn.length).toFixed(1);
+  const avgFreq  = Math.round(sn.reduce((s,n)=>s+n.freq,0)/sn.length);
+  const freqOk   = avgFreq >= 75;
+
+  document.getElementById('boletim-content').innerHTML = `
+    <div class="stats-grid" style="margin-bottom:18px">
+      <div class="stat-card ${parseFloat(avgGeral)>=7?'c-green':parseFloat(avgGeral)>=5?'c-amber':'c-red'}">
+        <div class="stat-label">Média Geral</div>
+        <div class="stat-value">${avgGeral}</div>
+        <div class="stat-change">Ano letivo 2025</div>
+      </div>
+      <div class="stat-card ${freqOk?'c-green':'c-red'}">
+        <div class="stat-label">Frequência Geral</div>
+        <div class="stat-value">${avgFreq}%</div>
+        <div class="stat-change ${freqOk?'':'down'}">${freqOk?'Dentro do limite':'⚠ Abaixo do mínimo'}</div>
+      </div>
+      <div class="stat-card c-blue">
+        <div class="stat-label">Disciplinas</div>
+        <div class="stat-value">${sn.length}</div>
+        <div class="stat-change">no semestre</div>
+      </div>
+    </div>
+
+    <div class="grade-table-wrap">
+      <div class="table-header">
+        <div class="table-title">Notas por Disciplina e Bimestre</div>
+      </div>
+      <table class="grade-table">
+        <thead>
+          <tr>
+            <th rowspan="2">Disciplina</th>
+            <th colspan="3">1° Bimestre</th>
+            <th colspan="3">2° Bimestre</th>
+            <th colspan="3">3° Bimestre</th>
+            <th colspan="3">4° Bimestre</th>
+            <th rowspan="2">Média</th>
+            <th rowspan="2">Frequência</th>
+          </tr>
+          <tr>
+            <th>Prova</th><th>Trab.</th><th>Rec.</th>
+            <th>Prova</th><th>Trab.</th><th>Rec.</th>
+            <th>Prova</th><th>Trab.</th><th>Rec.</th>
+            <th>Prova</th><th>Trab.</th><th>Rec.</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${sn.map(n => {
+            const freqCls = n.freq >= 75 ? '' : n.freq >= 60 ? 'mid' : 'low';
+            return `
+            <tr>
+              <td>${n.disc}</td>
+              <td class="grade-cell ${gradeClass(n.p1)}">${gradeDisplay(n.p1)}</td>
+              <td class="grade-cell ${gradeClass(n.t1)}">${gradeDisplay(n.t1)}</td>
+              <td class="grade-cell ${gradeClass(n.r1)}">${gradeDisplay(n.r1)}</td>
+              <td class="grade-cell ${gradeClass(n.p2)}">${gradeDisplay(n.p2)}</td>
+              <td class="grade-cell ${gradeClass(n.t2)}">${gradeDisplay(n.t2)}</td>
+              <td class="grade-cell ${gradeClass(n.r2)}">${gradeDisplay(n.r2)}</td>
+              <td class="grade-cell ${gradeClass(n.p3)}">${gradeDisplay(n.p3)}</td>
+              <td class="grade-cell ${gradeClass(n.t3)}">${gradeDisplay(n.t3)}</td>
+              <td class="grade-cell ${gradeClass(n.r3)}">${gradeDisplay(n.r3)}</td>
+              <td class="grade-cell ${gradeClass(n.p4)}">${gradeDisplay(n.p4)}</td>
+              <td class="grade-cell ${gradeClass(n.t4)}">${gradeDisplay(n.t4)}</td>
+              <td class="grade-cell ${gradeClass(n.r4)}">${gradeDisplay(n.r4)}</td>
+              <td class="grade-cell grade-avg ${gradeClass(n.media)}">${n.media.toFixed(1)}</td>
+              <td>
+                <div class="freq-bar-wrap">
+                  <div class="freq-bar"><div class="freq-fill ${freqCls}" style="width:${n.freq}%"></div></div>
+                  <span style="font-size:12px;color:var(--text-2)">${n.freq}%</span>
+                </div>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
+}
+
+// ================================================================
+// RENDER: FINANCEIRO
+// ================================================================
+
+function renderFinanceiro() {
+  document.getElementById('financeiro-tbody').innerHTML = mensalidades.map(m => {
+    const bcMap = { pago:'badge-paid', pendente:'badge-pending', atrasado:'badge-late' };
+    const blMap = { pago:'Pago', pendente:'Pendente', atrasado:'Atrasado' };
+    return `
+      <tr>
+        <td class="td-primary">${m.aluno}</td>
+        <td>${m.turma}</td>
+        <td>${m.vencimento}</td>
+        <td style="font-weight:600">${m.valor}</td>
+        <td>${m.formaPag}</td>
+        <td>${m.dataPag}</td>
+        <td><span class="badge ${bcMap[m.status]}">${blMap[m.status]}</span></td>
+        <td>
+          <button class="action-btn">Ver</button>
+          ${m.status !== 'pago' ? '<button class="action-btn">Registrar Pag.</button>' : ''}
+        </td>
+      </tr>`;
+  }).join('');
+}
+
+// ================================================================
+// RENDER: COMUNICADOS
+// ================================================================
+
+const icUser = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`;
+const icCal  = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`;
+const icPpl  = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>`;
+
+function renderComunicados() {
+  document.getElementById('comunicados-list').innerHTML = comunicados.map(c => `
+    <div class="comunicado-card ${c.status === 'ativo' ? 'com-active' : 'com-inactive'}">
+      <div class="comunicado-header">
+        <div class="comunicado-title">${c.titulo}</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+          ${statusBadge(c.status)}
+          <button class="action-btn">Editar</button>
+        </div>
+      </div>
+      <div class="comunicado-body">${c.corpo}</div>
+      <div class="comunicado-meta">
+        <span>${icUser} ${c.autor}</span>
+        <span>${icCal} ${c.data}</span>
+        <span>${icPpl} ${c.destinatario}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ================================================================
+// INIT
+// ================================================================
+
+// Set initial topbar
+document.getElementById('topbarActions').innerHTML = screenConfig.alunos.actions;
+
+renderAlunos();
+renderTurmas();
+initBoletim();
+renderFinanceiro();
+renderComunicados();
+</script>
+</body>
+</html>
