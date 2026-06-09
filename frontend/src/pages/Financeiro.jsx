@@ -140,7 +140,7 @@ export default function Financeiro() {
         <div className="fin-card">
           <div className="fin-label">Total a Receber</div>
           <div className="fin-value">{fmt(totalValor)}</div>
-          <div className="fin-sub">{mensalidades.length} mensalidades</div>
+          <div className="fin-sub">{filtered.length} de {mensalidades.length} mensalidades</div>
         </div>
         <div className="fin-card">
           <div className="fin-label">Total Recebido</div>

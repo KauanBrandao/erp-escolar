@@ -120,6 +120,11 @@ export default function Turmas() {
 
   const TURNOS = ['Matutino', 'Vespertino', 'Noturno']
 
+  function normalizeTurno(t) {
+    const map = { 'Manhã': 'Matutino', 'Manha': 'Matutino', 'Tarde': 'Vespertino', 'Noite': 'Noturno' }
+    return map[t] || t
+  }
+
   if (error) return <ErrorBox message={error} onRetry={load} />
 
   return (
@@ -130,10 +135,10 @@ export default function Turmas() {
           <div className="stat-value">{turmas.length}</div>
           <div className="stat-sub">{[...new Set(turmas.map(t => t.ano_letivo))].sort((a,b) => b-a).join(', ')}</div>
         </div>
-        {[...new Set(turmas.map(t => t.turno))].sort().map(turno => (
+        {[...new Set(turmas.map(t => normalizeTurno(t.turno)))].sort().map(turno => (
           <div className="stat-card" key={turno}>
             <div className="stat-label">{turno}</div>
-            <div className="stat-value">{turmas.filter(t => t.turno === turno).length}</div>
+            <div className="stat-value">{turmas.filter(t => normalizeTurno(t.turno) === turno).length}</div>
           </div>
         ))}
         <div className="stat-card">
