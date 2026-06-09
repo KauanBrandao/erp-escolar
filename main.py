@@ -33,6 +33,7 @@ from routers.RouterResponsavel import router as responsavel_router
 from routers.RouterTurma import router as turma_router
 from routers.RouterProfessor import router as professor_router
 from routers.RouterUsuario import router as user_router
+from routers.RouterSeed import router as seed_router
 
 Base.metadata.create_all(bind=engine)
 
@@ -64,6 +65,7 @@ app.include_router(perfil_router, prefix="/api")
 app.include_router(responsavel_router, prefix="/api")
 app.include_router(professor_router, prefix="/api")
 app.include_router(user_router, prefix="/api")
+app.include_router(seed_router, prefix="/api")
 
 _DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend", "dist")
 
