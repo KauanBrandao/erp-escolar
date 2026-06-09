@@ -1,9 +1,6 @@
 {
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/dist",
-  "functions": {
-    "api/index.py": {}
-  },
   "rewrites": [
     { "source": "/auth/:path*", "destination": "/api/index.py" },
     { "source": "/alunos/:path*", "destination": "/api/index.py" },
