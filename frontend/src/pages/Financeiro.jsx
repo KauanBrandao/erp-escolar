@@ -8,13 +8,6 @@ import { Loading, ErrorBox, Badge } from '../components/StateBox'
 const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const FORMAS = ['PIX', 'Boleto', 'Cartão de Crédito', 'Cartão de Débito', 'Transferência', 'Dinheiro']
 
-function PlusIcon() {
-  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-}
-
-const EMPTY_MENS = { aluno_id: '', mes: new Date().getMonth() + 1, ano: new Date().getFullYear(), valor: '' }
-const EMPTY_PAG  = { mensalidade_id: '', data_pagamento: new Date().toISOString().slice(0,10), valor_pago: '', forma_pagamento: 'PIX', comprovante: '' }
-
 export default function Financeiro() {
   const toast = useToast()
   const [mensalidades, setMensalidades] = useState([])
@@ -26,13 +19,10 @@ export default function Financeiro() {
   const [search, setSearch] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
   const [filterMes, setFilterMes] = useState('')
-
-  const [mModal, setMModal] = useState({ open: false })
-  const [mForm, setMForm] = useState(EMPTY_MENS)
-  const [mSaving, setMSaving] = useState(false)
+  const [filterAno, setFilterAno] = useState(String(new Date().getFullYear()))
 
   const [pModal, setPModal] = useState({ open: false, mens: null })
-  const [pForm, setPForm] = useState(EMPTY_PAG)
+  const [pForm, setPForm] = useState({})
   const [pSaving, setPSaving] = useState(false)
 
   const [mConfirm, setMConfirm] = useState({ open: false, id: null })
@@ -64,6 +54,8 @@ export default function Financeiro() {
     return 'pendente'
   }
 
+  const anos = [...new Set(mensalidades.map(m => m.ano))].sort((a, b) => b - a)
+
   const filtered = mensalidades.filter(m => {
     const aluno = getAluno(m.aluno_id)
     const q = search.toLowerCase()
@@ -71,11 +63,10 @@ export default function Financeiro() {
     const status = getMensStatus(m)
     const matchStatus = !filterStatus || status === filterStatus
     const matchMes = !filterMes || m.mes === Number(filterMes)
-    return matchSearch && matchStatus && matchMes
+    const matchAno = !filterAno || m.ano === Number(filterAno)
+    return matchSearch && matchStatus && matchMes && matchAno
   })
 
-  // Resumo financeiro — baseado nos registros filtrados
-  console.log('[Financeiro] filterMes:', filterMes, '| filtered.length:', filtered.length, '| mensalidades[0]?.mes typeof:', typeof mensalidades[0]?.mes)
   const totalValor = filtered.reduce((s, m) => s + m.valor, 0)
   const totalRecebido = filtered.reduce((s, m) => {
     const p = getPagamento(m.id)
@@ -83,32 +74,9 @@ export default function Financeiro() {
   }, 0)
   const totalPendente = totalValor - totalRecebido
 
-  // ---- MENSALIDADE ----
-  async function saveMens() {
-    if (!mForm.aluno_id || !mForm.valor) { toast('Preencha os campos obrigatórios.', 'warning'); return }
-    try {
-      setMSaving(true)
-      await api.post('/mensalidades', {
-        aluno_id: Number(mForm.aluno_id),
-        mes: Number(mForm.mes),
-        ano: Number(mForm.ano),
-        valor: Number(mForm.valor),
-      })
-      toast('Mensalidade criada!'); setMModal({ open: false }); load()
-    } catch (e) { toast(e.message, 'error') }
-    finally { setMSaving(false) }
-  }
-
-  async function deleteMens() {
-    try {
-      setMDeleting(true)
-      await api.del(`/mensalidades/${mConfirm.id}`)
-      toast('Mensalidade excluída.'); setMConfirm({ open: false }); load()
-    } catch (e) { toast(e.message, 'error') }
-    finally { setMDeleting(false) }
-  }
-
   // ---- PAGAMENTO ----
+  const EMPTY_PAG = { data_pagamento: new Date().toISOString().slice(0,10), valor_pago: '', forma_pagamento: 'PIX', comprovante: '' }
+
   function openPagamento(mens) {
     setPForm({ ...EMPTY_PAG, mensalidade_id: String(mens.id), valor_pago: String(mens.valor) })
     setPModal({ open: true, mens })
@@ -128,6 +96,15 @@ export default function Financeiro() {
       toast('Pagamento registrado!'); setPModal({ open: false }); load()
     } catch (e) { toast(e.message, 'error') }
     finally { setPSaving(false) }
+  }
+
+  async function deleteMens() {
+    try {
+      setMDeleting(true)
+      await api.del(`/mensalidades/${mConfirm.id}`)
+      toast('Mensalidade excluída.'); setMConfirm({ open: false }); load()
+    } catch (e) { toast(e.message, 'error') }
+    finally { setMDeleting(false) }
   }
 
   function fmt(v) { return `R$ ${Number(v).toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, '.')}` }
@@ -164,11 +141,6 @@ export default function Financeiro() {
             <div className="card-title">Mensalidades</div>
             <div className="card-count">{filtered.length} de {mensalidades.length} registros</div>
           </div>
-          <div className="card-actions">
-            <button className="btn btn-primary" onClick={() => { setMForm(EMPTY_MENS); setMModal({ open: true }) }}>
-              <PlusIcon /> Nova Mensalidade
-            </button>
-          </div>
         </div>
 
         <div className="filter-bar">
@@ -178,6 +150,10 @@ export default function Financeiro() {
             </svg>
             <input className="search-input" placeholder="Buscar aluno..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
+          <select className="filter-select" value={filterAno} onChange={e => setFilterAno(e.target.value)}>
+            <option value="">Todos os anos</option>
+            {anos.map(a => <option key={a} value={a}>{a}</option>)}
+          </select>
           <select className="filter-select" value={filterMes} onChange={e => setFilterMes(e.target.value)}>
             <option value="">Todos os meses</option>
             {MESES.map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
@@ -209,8 +185,7 @@ export default function Financeiro() {
                 {filtered.length === 0 ? (
                   <tr><td colSpan={8}>
                     <div className="state-box">
-                      <p>Nenhuma mensalidade encontrada.</p>
-                      <button className="btn btn-primary" onClick={() => setMModal({ open: true })}><PlusIcon /> Nova Mensalidade</button>
+                      <p>Nenhuma mensalidade encontrada para os filtros selecionados.</p>
                     </div>
                   </td></tr>
                 ) : filtered.map(m => {
@@ -250,38 +225,6 @@ export default function Financeiro() {
         </div>
       </div>
 
-      {/* Modal Nova Mensalidade */}
-      <Modal open={mModal.open} title="Nova Mensalidade" onClose={() => setMModal({ open: false })}
-        footer={<>
-          <button className="btn btn-secondary" onClick={() => setMModal({ open: false })}>Cancelar</button>
-          <button className="btn btn-primary" onClick={saveMens} disabled={mSaving}>{mSaving ? 'Salvando...' : 'Criar'}</button>
-        </>}
-      >
-        <div className="form-grid form-grid-2">
-          <div className="form-field full">
-            <label>Aluno *</label>
-            <select value={mForm.aluno_id} onChange={e => setMForm(f => ({ ...f, aluno_id: e.target.value }))}>
-              <option value="">Selecione o aluno</option>
-              {alunos.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
-            </select>
-          </div>
-          <div className="form-field">
-            <label>Mês *</label>
-            <select value={mForm.mes} onChange={e => setMForm(f => ({ ...f, mes: Number(e.target.value) }))}>
-              {MESES.map((m, i) => <option key={i+1} value={i+1}>{m}</option>)}
-            </select>
-          </div>
-          <div className="form-field">
-            <label>Ano *</label>
-            <input type="number" value={mForm.ano} onChange={e => setMForm(f => ({ ...f, ano: e.target.value }))} min="2000" max="2100" />
-          </div>
-          <div className="form-field full">
-            <label>Valor (R$) *</label>
-            <input type="number" step="0.01" min="0" value={mForm.valor} onChange={e => setMForm(f => ({ ...f, valor: e.target.value }))} placeholder="Ex: 950.00" />
-          </div>
-        </div>
-      </Modal>
-
       {/* Modal Registrar Pagamento */}
       <Modal open={pModal.open} title={`Registrar Pagamento — ${getAluno(pModal.mens?.aluno_id)?.nome || ''}`}
         onClose={() => setPModal({ open: false })}
@@ -293,27 +236,27 @@ export default function Financeiro() {
         <div className="form-grid form-grid-2">
           <div className="form-field">
             <label>Data do Pagamento *</label>
-            <input type="date" value={pForm.data_pagamento} onChange={e => setPForm(f => ({ ...f, data_pagamento: e.target.value }))} />
+            <input type="date" value={pForm.data_pagamento || ''} onChange={e => setPForm(f => ({ ...f, data_pagamento: e.target.value }))} />
           </div>
           <div className="form-field">
             <label>Valor Pago (R$) *</label>
-            <input type="number" step="0.01" min="0" value={pForm.valor_pago} onChange={e => setPForm(f => ({ ...f, valor_pago: e.target.value }))} />
+            <input type="number" step="0.01" min="0" value={pForm.valor_pago || ''} onChange={e => setPForm(f => ({ ...f, valor_pago: e.target.value }))} />
           </div>
           <div className="form-field full">
             <label>Forma de Pagamento *</label>
-            <select value={pForm.forma_pagamento} onChange={e => setPForm(f => ({ ...f, forma_pagamento: e.target.value }))}>
+            <select value={pForm.forma_pagamento || 'PIX'} onChange={e => setPForm(f => ({ ...f, forma_pagamento: e.target.value }))}>
               {FORMAS.map(f => <option key={f} value={f}>{f}</option>)}
             </select>
           </div>
           <div className="form-field full">
             <label>Comprovante / Observação</label>
-            <input value={pForm.comprovante} onChange={e => setPForm(f => ({ ...f, comprovante: e.target.value }))} placeholder="Nº do comprovante ou observação (opcional)" />
+            <input value={pForm.comprovante || ''} onChange={e => setPForm(f => ({ ...f, comprovante: e.target.value }))} placeholder="Nº do comprovante ou observação (opcional)" />
           </div>
         </div>
       </Modal>
 
       <ConfirmDialog open={mConfirm.open} title="Excluir Mensalidade"
-        message="Excluir esta mensalidade? Os pagamentos vinculados também podem ser afetados."
+        message="Excluir esta mensalidade? Os pagamentos vinculados também serão removidos."
         onConfirm={deleteMens} onCancel={() => setMConfirm({ open: false })} loading={mDeleting} />
     </>
   )

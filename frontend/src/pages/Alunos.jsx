@@ -10,7 +10,7 @@ const EMPTY_FORM = {
   data_nascimento: '', ativo: true,
 }
 
-const EMPTY_MAT = { aluno_id: '', turma_id: '', data_matricula: '', status: 'ativa', observacao: '' }
+const EMPTY_MAT = { aluno_id: '', turma_id: '', data_matricula: '', status: 'ativa', observacao: '', valor_mensalidade: '' }
 
 function PlusIcon() {
   return (
@@ -162,14 +162,19 @@ export default function Alunos() {
   async function handleSaveMatricula() {
     try {
       setSavingMat(true)
-      const payload = { ...matForm, turma_id: Number(matForm.turma_id), aluno_id: Number(matModal.alunoId) }
+      const payload = {
+        ...matForm,
+        turma_id: Number(matForm.turma_id),
+        aluno_id: Number(matModal.alunoId),
+        valor_mensalidade: matForm.valor_mensalidade ? Number(matForm.valor_mensalidade) : 0,
+      }
       if (matModal.data) {
-        const { aluno_id, data_matricula, ...upd } = payload
+        const { aluno_id, data_matricula, valor_mensalidade, ...upd } = payload
         await api.put(`/matriculas/${matModal.data.id}`, upd)
         toast('Matrícula atualizada!')
       } else {
         await api.post('/matriculas', payload)
-        toast('Matrícula criada!')
+        toast('Matrícula criada! 12 mensalidades geradas automaticamente.')
       }
       setMatModal({ open: false })
       load()
@@ -396,6 +401,20 @@ export default function Alunos() {
             <label>Data da Matrícula *</label>
             <input type="date" value={matForm.data_matricula} onChange={e => setMatForm(f => ({ ...f, data_matricula: e.target.value }))} disabled={!!matModal.data} />
           </div>
+          {!matModal.data && (
+            <div className="form-field">
+              <label>Valor da Mensalidade (R$)</label>
+              <input
+                type="number" step="0.01" min="0"
+                value={matForm.valor_mensalidade}
+                onChange={e => setMatForm(f => ({ ...f, valor_mensalidade: e.target.value }))}
+                placeholder="Ex: 950.00"
+              />
+              <span style={{ fontSize: '11px', color: 'var(--text-3)', marginTop: '4px', display: 'block' }}>
+                12 mensalidades serão geradas automaticamente para o ano letivo da turma
+              </span>
+            </div>
+          )}
           <div className="form-field">
             <label>Status</label>
             <select value={matForm.status} onChange={e => setMatForm(f => ({ ...f, status: e.target.value }))}>

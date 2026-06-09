@@ -4,7 +4,7 @@ import { useToast } from '../components/Toast'
 import Modal from '../components/Modal'
 import { Loading, ErrorBox } from '../components/StateBox'
 
-const EMPTY_NOTA = { aluno_id: '', disciplina_id: '', valor: '', tipo: 'prova', bimestre: '1' }
+const EMPTY_NOTA = { aluno_id: '', disciplina_id: '', valor: '', tipo: 'prova', trimestre: '1' }
 const EMPTY_FREQ = { aluno_id: '', disciplina_id: '', data_aula: '', presente: true, justificativa: '' }
 
 function nota_class(v) {
@@ -108,13 +108,13 @@ export default function Boletim() {
   const nModalDiscs = getDiscipinasDoAluno(nForm.aluno_id)
   const fModalDiscs = getDiscipinasDoAluno(fForm.aluno_id)
 
-  // Build nota grid
+  // Build nota grid (3 trimestres)
   function getNotaGrid() {
-    const bimestres = [1, 2, 3, 4]
+    const trimestres = [1, 2, 3]
     const tipos = ['prova', 'trabalho', 'recuperacao']
     return alunoDisciplinas.map(disc => {
       const row = { disc }
-      bimestres.forEach(b => {
+      trimestres.forEach(b => {
         tipos.forEach(tipo => {
           const n = alunoNotas.find(n => n.disciplina_id === disc.id && n.bimestre === b && n.tipo === tipo)
           row[`${b}_${tipo}`] = n?.valor ?? null
@@ -156,7 +156,7 @@ export default function Boletim() {
         disciplina_id: Number(nForm.disciplina_id),
         valor: Number(nForm.valor),
         tipo: nForm.tipo,
-        bimestre: Number(nForm.bimestre),
+        bimestre: Number(nForm.trimestre),
       })
       toast('Nota lançada!'); setNModal({ open: false }); load()
     } catch (e) { toast(e.message, 'error') }
@@ -269,7 +269,7 @@ export default function Boletim() {
             fontFamily: 'Plus Jakarta Sans, sans-serif',
             transition: 'color .15s',
           }}>
-            {tab === 'notas' ? 'Notas por Bimestre' : 'Frequência'}
+            {tab === 'notas' ? 'Notas por Trimestre' : 'Frequência'}
           </button>
         ))}
       </div>
@@ -277,9 +277,9 @@ export default function Boletim() {
       {/* Notas */}
       {activeTab === 'notas' && (
         <>
-          {/* Bimestre sub-tabs */}
+          {/* Trimestre sub-tabs */}
           <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-            {[1,2,3,4].map(b => (
+            {[1,2,3].map(b => (
               <button key={b} onClick={() => setActiveBim(b)} style={{
                 padding: '7px 18px', borderRadius: '8px',
                 border: activeBim === b ? '2px solid var(--primary)' : '2px solid var(--border)',
@@ -288,7 +288,7 @@ export default function Boletim() {
                 fontWeight: 600, fontSize: '13px', cursor: 'pointer',
                 fontFamily: 'Plus Jakarta Sans, sans-serif',
                 transition: 'all .15s',
-              }}>{b}° Bimestre</button>
+              }}>{b}° Trimestre</button>
             ))}
             <button onClick={() => setActiveBim(0)} style={{
               padding: '7px 18px', borderRadius: '8px',
@@ -306,7 +306,7 @@ export default function Boletim() {
             <div className="card">
               <div className="card-header" style={{ marginBottom: '0' }}>
                 <div>
-                  <div className="card-title">{activeBim}° Bimestre</div>
+                  <div className="card-title">{activeBim}° Trimestre</div>
                   {!loading && (
                     <div className="card-count">
                       {notaGrid.filter(r => r[`${activeBim}_prova`] !== null || r[`${activeBim}_trabalho`] !== null).length} de {notaGrid.length} disciplinas com notas
@@ -322,7 +322,7 @@ export default function Boletim() {
                       <th>Prova</th>
                       <th>Trabalho</th>
                       <th>Recuperação</th>
-                      <th>Média do Bimestre</th>
+                      <th>Média do Trimestre</th>
                     </tr>
                   </thead>
                   {loading ? <Loading rows={6} /> : (
@@ -358,7 +358,7 @@ export default function Boletim() {
             <div className="card">
               <div className="card-header" style={{ marginBottom: '0' }}>
                 <div>
-                  <div className="card-title">Resumo Geral — Médias por Bimestre</div>
+                  <div className="card-title">Resumo Geral — Médias por Trimestre</div>
                   {!loading && <div className="card-count">{notaGrid.length} disciplinas</div>}
                 </div>
               </div>
@@ -367,10 +367,9 @@ export default function Boletim() {
                   <thead>
                     <tr>
                       <th style={{ textAlign: 'left' }}>Disciplina</th>
-                      <th>1° Bim</th>
-                      <th>2° Bim</th>
-                      <th>3° Bim</th>
-                      <th>4° Bim</th>
+                      <th>1° Tri</th>
+                      <th>2° Tri</th>
+                      <th>3° Tri</th>
                       <th>Média Final</th>
                       <th>Freq.</th>
                       <th>Situação</th>
@@ -379,7 +378,7 @@ export default function Boletim() {
                   {loading ? <Loading rows={6} /> : (
                     <tbody>
                       {notaGrid.length === 0 ? (
-                        <tr><td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-3)' }}>
+                        <tr><td colSpan={7} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-3)' }}>
                           Selecione um aluno para ver o boletim.
                         </td></tr>
                       ) : notaGrid.map(row => {
@@ -394,7 +393,6 @@ export default function Boletim() {
                             <td>{fmt(row['1_media'])}</td>
                             <td>{fmt(row['2_media'])}</td>
                             <td>{fmt(row['3_media'])}</td>
-                            <td>{fmt(row['4_media'])}</td>
                             <td>
                               {row.media_geral !== null ? (
                                 <strong className={`nota-cell ${nota_class(row.media_geral)}`}>
@@ -522,9 +520,9 @@ export default function Boletim() {
             </select>
           </div>
           <div className="form-field">
-            <label>Bimestre *</label>
-            <select value={nForm.bimestre} onChange={e => setNForm(f => ({ ...f, bimestre: e.target.value }))}>
-              {[1,2,3,4].map(b => <option key={b} value={b}>{b}° Bimestre</option>)}
+            <label>Trimestre *</label>
+            <select value={nForm.trimestre} onChange={e => setNForm(f => ({ ...f, trimestre: e.target.value }))}>
+              {[1,2,3].map(b => <option key={b} value={b}>{b}° Trimestre</option>)}
             </select>
           </div>
           <div className="form-field full">
