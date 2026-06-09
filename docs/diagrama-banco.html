@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Diagrama do Banco de Dados — EduGestão</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #e2e8f0;
+      min-height: 100vh;
+      padding: 32px 24px;
+    }
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    header h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: #f8fafc;
+      letter-spacing: -0.02em;
+    }
+    header p {
+      font-size: 13px;
+      color: #64748b;
+      margin-top: 6px;
+    }
+    .legend {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+    .diagram-wrap {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 32px;
+      overflow-x: auto;
+    }
+    .mermaid {
+      display: flex;
+      justify-content: center;
+    }
+    /* override mermaid default dark */
+    .mermaid svg { max-width: 100%; height: auto; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Diagrama do Banco de Dados — EduGestão</h1>
+  <p>TDE Métodos Ágeis 2026.1 · UNIFAN · Modelagem Final</p>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot" style="background:#3b82f6"></div> Acadêmico</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#10b981"></div> Financeiro</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6"></div> Usuários / Acesso</div>
+  <div class="legend-item"><div class="legend-dot" style="background:#f59e0b"></div> Novo nesta versão</div>
+</div>
+
+<div class="diagram-wrap">
+  <div class="mermaid">
+erDiagram
+
+  Perfis {
+    int id PK
+    string nome
+    string descricao
+  }
+
+  Usuarios {
+    int id PK
+    string nome
+    string email
+    string senha_hash
+    bool ativo
+    date criado_em
+    int perfil_id FK
+  }
+
+  Responsaveis {
+    int id PK
+    string nome
+    string cpf
+    string telefone
+    string email
+    int parentesco FK
+  }
+
+  Alunos {
+    int id PK
+    string nome
+    string cpf
+    string telefone
+    int matricula_numero
+    bool ativo
+    date data_nascimento
+    date criado_em
+    int responsavel_id FK
+  }
+
+  Turmas {
+    int id PK
+    string nome
+    string serie
+    string turno
+    int ano_letivo
+    int perfil_id FK
+  }
+
+  Professores {
+    int id PK
+    string nome
+    string cpf
+    string email
+    string telefone
+    string especialidade
+    bool ativo
+    date criado_em
+  }
+
+  Disciplinas {
+    int id PK
+    string nome
+    string codigo
+    int carga_horaria
+    int turma_id FK
+    int professor_id FK
+  }
+
+  Matriculas {
+    int id PK
+    int aluno_id FK
+    int turma_id FK
+    date data_matricula
+    string status
+    string observacao
+  }
+
+  Notas {
+    int id PK
+    decimal valor
+    string tipo
+    int trimestre
+    date lancado_em
+    int aluno_id FK
+    int disciplina_id FK
+  }
+
+  Frequencias {
+    int id PK
+    date data_aula
+    bool presente
+    text justificativa
+    int disciplina_id FK
+    int aluno_id FK
+  }
+
+  Mensalidade {
+    int id PK
+    int aluno_id FK
+    int mes
+    int ano
+    float valor
+    date vencimento
+    string status
+  }
+
+  Pagamentos {
+    int id PK
+    date data_pagamento
+    float valor_pago
+    string forma_pagamento
+    string comprovante
+    int mensalidade_id FK
+  }
+
+  Comunicados {
+    int id PK
+    string titulo
+    text conteudo
+    int destinatario_id FK
+    date enviado_em
+    bool ativo
+  }
+
+  Perfis        ||--o{ Usuarios       : "tem"
+  Perfis        ||--o{ Turmas         : "vinculado"
+  Usuarios      ||--o{ Responsaveis   : "parentesco"
+  Usuarios      ||--o{ Comunicados    : "destinatário"
+  Responsaveis  ||--o{ Alunos         : "responsável por"
+  Alunos        ||--o{ Matriculas     : "realiza"
+  Turmas        ||--o{ Matriculas     : "recebe"
+  Turmas        ||--o{ Disciplinas    : "contém"
+  Professores   ||--o{ Disciplinas    : "leciona"
+  Alunos        ||--o{ Notas          : "recebe"
+  Disciplinas   ||--o{ Notas          : "gera"
+  Alunos        ||--o{ Frequencias    : "registra"
+  Disciplinas   ||--o{ Frequencias    : "registra"
+  Alunos        ||--o{ Mensalidade    : "possui"
+  Mensalidade   ||--o{ Pagamentos     : "quitada por"
+
+  </div>
+</div>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    er: {
+      diagramPadding: 30,
+      layoutDirection: 'TB',
+      minEntityWidth: 100,
+      minEntityHeight: 75,
+      entityPadding: 15,
+      useMaxWidth: true,
+    },
+    themeVariables: {
+      primaryColor: '#1e3a5f',
+      primaryTextColor: '#e2e8f0',
+      primaryBorderColor: '#3b82f6',
+      lineColor: '#475569',
+      secondaryColor: '#1e293b',
+      tertiaryColor: '#0f172a',
+      edgeLabelBackground: '#1e293b',
+      attributeBackgroundColorEven: '#1e293b',
+      attributeBackgroundColorOdd: '#162032',
+    }
+  })
+</script>
+
+</body>
+</html>
