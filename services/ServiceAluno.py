@@ -10,6 +10,10 @@ class ServiceAluno:
         self.repository = AlunoRepository(db)
 
     def criar(self, dados: AlunoCreate):
+        if self.repository.get_by_cpf(dados.cpf):
+            raise HTTPException(status_code=409, detail="CPF já cadastrado no sistema")
+        if self.repository.get_by_matricula(dados.matricula_numero):
+            raise HTTPException(status_code=409, detail="Número de matrícula já existe")
         return self.repository.create(dados)
 
     def buscar_por_id(self, aluno_id: int):

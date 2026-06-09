@@ -18,6 +18,12 @@ class ResponsavelRepository:
     def get_byID(self, responsavel_id: int) -> ModelResponsavel | None:
         return self.db.query(ModelResponsavel).filter(ModelResponsavel.id == responsavel_id).first()
 
+    def get_by_cpf(self, cpf: str) -> ModelResponsavel | None:
+        return self.db.query(ModelResponsavel).filter(ModelResponsavel.cpf == cpf).first()
+
+    def get_by_email(self, email: str) -> ModelResponsavel | None:
+        return self.db.query(ModelResponsavel).filter(ModelResponsavel.email == email).first()
+
     def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelResponsavel]:
         return self.db.query(ModelResponsavel).offset(skip).limit(limit).all()
 

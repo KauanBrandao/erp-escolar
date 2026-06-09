@@ -20,6 +20,12 @@ class AlunoRepository:
     def get_byID(self, aluno_id: int) -> ModelAluno | None:
         return self.db.query(ModelAluno).filter(ModelAluno.id == aluno_id).first()
 
+    def get_by_cpf(self, cpf: str) -> ModelAluno | None:
+        return self.db.query(ModelAluno).filter(ModelAluno.cpf == cpf).first()
+
+    def get_by_matricula(self, matricula_numero: int) -> ModelAluno | None:
+        return self.db.query(ModelAluno).filter(ModelAluno.matricula_numero == matricula_numero).first()
+
     def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelAluno]:
         return self.db.query(ModelAluno).offset(skip).limit(limit).all()
 

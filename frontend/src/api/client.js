@@ -39,6 +39,7 @@ async function request(method, path, body = null) {
     const msg = Array.isArray(data?.detail)
       ? data.detail.map(e => e.msg || e).join(', ')
       : data?.detail || `Erro ${res.status}`
+    console.error(`[API] ${method} ${path} → ${res.status}:`, msg, data)
     throw new Error(msg)
   }
 
