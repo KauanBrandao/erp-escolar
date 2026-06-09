@@ -11,11 +11,9 @@ Sistema ERP web completo para gestão escolar, cobrindo módulos acadêmicos e f
 
 ## Equipe
 
-| Nome | Papel |
-|---|---|
-| Kauan Brandão | Tech Lead / Backend |
-| Kevin Mascarenhas | Backend / Banco de Dados |
-| João Lucca | Frontend / UI |
+- Kauan Brandão
+- Kevin Mascarenhas
+- João Lucca
 
 ---
 
@@ -38,10 +36,12 @@ Sistema ERP web completo para gestão escolar, cobrindo módulos acadêmicos e f
 
 | Módulo | Descrição |
 |---|---|
-| Alunos & Matrículas | Cadastro de alunos, vínculo com turmas (ativa/trancada/cancelada) |
-| Turmas & Disciplinas | Gestão de turmas por série, turno e ano letivo |
-| Boletim & Frequência | Notas por bimestre e tipo, presença por aula |
-| Financeiro | Mensalidades e pagamentos com status e formas de pagamento |
+| Dashboard | Visão geral com KPIs em tempo real: alunos ativos, média geral, frequência, inadimplência, desempenho por turma e alunos em atenção |
+| Alunos & Matrículas | Cadastro de alunos com geração automática de 12 mensalidades ao matricular (vencimento dia 10 de cada mês) |
+| Turmas & Disciplinas | Gestão de turmas por série, turno e ano letivo; disciplinas com professor responsável vinculado |
+| Professores | Cadastro completo de professores com especialidade, vínculo a disciplinas e controle de status |
+| Boletim & Frequência | Notas por trimestre (1°/2°/3°) e tipo (prova/trabalho/recuperação); frequência por aula com resumo e busca por digitação |
+| Financeiro | Mensalidades geradas automaticamente por matrícula; filtros por ano, mês e status; registro de pagamento com forma e comprovante |
 | Comunicados | Avisos e comunicados institucionais |
 | Usuários | Contas com perfis e permissões (RBAC) |
 
@@ -52,8 +52,8 @@ Sistema ERP web completo para gestão escolar, cobrindo módulos acadêmicos e f
 | Perfil | Permissões |
 |---|---|
 | Administrador | Acesso total |
-| Secretaria | Alunos, responsáveis, turmas, matrículas |
-| Coordenação Pedagógica | Disciplinas, notas, frequências, comunicados |
+| Secretaria | Alunos, turmas, matrículas, professores (leitura e escrita) |
+| Coordenação Pedagógica | Disciplinas, notas, frequências, comunicados, leitura de professores |
 | Financeiro | Mensalidades e pagamentos |
 | Responsável | Leitura: notas, frequências e mensalidades |
 
