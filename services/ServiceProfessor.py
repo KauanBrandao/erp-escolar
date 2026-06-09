@@ -1,6 +1,7 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from models.ModelDisciplina import ModelDisciplina
 from repositories.RepositoryProfessor import ProfessorRepository
 
 
@@ -33,5 +34,10 @@ class ServiceProfessor:
     def deletar(self, obj_id: int):
         if not self.repo.get_byID(obj_id):
             raise HTTPException(status_code=404, detail="Professor não encontrado")
+        db = self.repo.db
+        db.query(ModelDisciplina).filter(ModelDisciplina.professor_id == obj_id).update(
+            {"professor_id": None}, synchronize_session=False
+        )
+        db.commit()
         self.repo.delete(obj_id)
         return {"mensagem": "Professor deletado com sucesso"}
