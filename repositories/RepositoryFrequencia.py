@@ -18,7 +18,7 @@ class FrequenciaRepository:
     def get_byID(self, frequencia_id: int) -> ModelFrequencia | None:
         return self.db.query(ModelFrequencia).filter(ModelFrequencia.id == frequencia_id).first()
 
-    def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelFrequencia]:
+    def get_all(self, skip: int = 0, limit: int = 5000) -> list[ModelFrequencia]:
         return self.db.query(ModelFrequencia).offset(skip).limit(limit).all()
 
     def update(self, frequencia_id: int, dados: FrequenciaUpdate) -> ModelFrequencia | None:

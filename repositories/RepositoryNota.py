@@ -20,7 +20,7 @@ class NotaRepository:
     def get_byID(self, nota_id: int) -> ModelNota | None:
         return self.db.query(ModelNota).filter(ModelNota.id == nota_id).first()
 
-    def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelNota]:
+    def get_all(self, skip: int = 0, limit: int = 5000) -> list[ModelNota]:
         return self.db.query(ModelNota).offset(skip).limit(limit).all()
 
     def update(self, nota_id: int, dados: NotaUpdate) -> ModelNota | None:

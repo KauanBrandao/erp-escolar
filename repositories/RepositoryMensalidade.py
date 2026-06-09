@@ -24,7 +24,7 @@ class MensalidadeRepository:
     def get_byID(self, mensalidade_id: int) -> ModelMensalidade | None:
         return self.db.query(ModelMensalidade).filter(ModelMensalidade.id == mensalidade_id).first()
 
-    def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelMensalidade]:
+    def get_all(self, skip: int = 0, limit: int = 5000) -> list[ModelMensalidade]:
         return self.db.query(ModelMensalidade).offset(skip).limit(limit).all()
 
     def update(self, mensalidade_id: int, dados: MensalidadeUpdate) -> ModelMensalidade | None:
