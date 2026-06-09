@@ -7,10 +7,18 @@ from dotenv import load_dotenv
 load_dotenv()
 
 
-SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+_url = os.getenv("DATABASE_URL") or os.getenv("POSTGRES_URL_NON_POOLING")
 
-if not SQLALCHEMY_DATABASE_URL:
-    raise ValueError("A variavel de ambiente DATABASE_URL não foi definida!")
+if not _url:
+    raise ValueError("Nenhuma variavel de banco encontrada (DATABASE_URL ou POSTGRES_URL_NON_POOLING)!")
+
+# Garante o dialeto psycopg2 para SQLAlchemy
+if _url.startswith("postgres://"):
+    _url = _url.replace("postgres://", "postgresql+psycopg2://", 1)
+elif _url.startswith("postgresql://"):
+    _url = _url.replace("postgresql://", "postgresql+psycopg2://", 1)
+
+SQLALCHEMY_DATABASE_URL = _url
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
