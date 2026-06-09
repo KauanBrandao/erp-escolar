@@ -199,7 +199,7 @@ export default function Boletim() {
   return (
     <>
       {/* Selector */}
-      <div className="card" style={{ padding: '16px 20px' }}>
+      <div className="card" style={{ padding: '16px 20px', overflow: 'visible' }}>
         <div className="boletim-controls">
           <div style={{ flex: 1, minWidth: '200px', maxWidth: '380px', position: 'relative' }}>
             <label style={{ display: 'block', marginBottom: '6px' }}>Aluno</label>
