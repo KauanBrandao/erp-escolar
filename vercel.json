@@ -1,22 +1,5 @@
 {
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/dist",
   "rewrites": [
-    { "source": "/auth/:path*", "destination": "/api/index.py" },
-    { "source": "/alunos/:path*", "destination": "/api/index.py" },
-    { "source": "/turmas/:path*", "destination": "/api/index.py" },
-    { "source": "/matriculas/:path*", "destination": "/api/index.py" },
-    { "source": "/notas/:path*", "destination": "/api/index.py" },
-    { "source": "/comunicados/:path*", "destination": "/api/index.py" },
-    { "source": "/disciplinas/:path*", "destination": "/api/index.py" },
-    { "source": "/frequencias/:path*", "destination": "/api/index.py" },
-    { "source": "/mensalidades/:path*", "destination": "/api/index.py" },
-    { "source": "/pagamentos/:path*", "destination": "/api/index.py" },
-    { "source": "/perfis/:path*", "destination": "/api/index.py" },
-    { "source": "/responsaveis/:path*", "destination": "/api/index.py" },
-    { "source": "/usuarios/:path*", "destination": "/api/index.py" },
-    { "source": "/docs/:path*", "destination": "/api/index.py" },
-    { "source": "/openapi.json", "destination": "/api/index.py" },
-    { "source": "/:path*", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/api/index.py" }
   ]
 }

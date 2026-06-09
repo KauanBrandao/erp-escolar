@@ -1,5 +1,7 @@
-﻿from fastapi import FastAPI
+﻿import os
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 
 from core.database import Base, engine
 from routers.RouterAluno import router as aluno_router
@@ -46,4 +48,15 @@ app.include_router(perfil_router)
 app.include_router(responsavel_router)
 app.include_router(user_router)
 
+_DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend", "dist")
 
+@app.get("/assets/{file_path:path}", include_in_schema=False)
+def serve_assets(file_path: str):
+    full = os.path.join(_DIST, "assets", file_path)
+    if os.path.isfile(full):
+        return FileResponse(full)
+    raise HTTPException(status_code=404)
+
+@app.get("/{full_path:path}", include_in_schema=False)
+def serve_frontend(full_path: str):
+    return FileResponse(os.path.join(_DIST, "index.html"))
