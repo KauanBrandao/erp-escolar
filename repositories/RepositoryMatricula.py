@@ -9,7 +9,8 @@ class MatriculaRepository:
         self.db = db
 
     def create(self, matricula: MatriculaCreate) -> ModelMatricula:
-        db_matricula = ModelMatricula(**matricula.model_dump())
+        dados = matricula.model_dump(exclude={'valor_mensalidade'})
+        db_matricula = ModelMatricula(**dados)
         self.db.add(db_matricula)
         self.db.commit()
         self.db.refresh(db_matricula)
