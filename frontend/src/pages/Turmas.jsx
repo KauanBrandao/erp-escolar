@@ -3,10 +3,10 @@ import { api } from '../api/client'
 import { useToast } from '../components/Toast'
 import Modal from '../components/Modal'
 import { ConfirmDialog } from '../components/Modal'
-import { ErrorBox, Badge } from '../components/StateBox'
+import { ErrorBox } from '../components/StateBox'
 
 const EMPTY_TURMA = { nome: '', serie: '', turno: 'Matutino', ano_letivo: new Date().getFullYear() }
-const EMPTY_DISC  = { nome: '', codigo: '', carga_horaria: '', turma_id: '' }
+const EMPTY_DISC  = { nome: '', codigo: '', carga_horaria: '', turma_id: '', professor_id: '' }
 
 function PlusIcon() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -22,6 +22,7 @@ export default function Turmas() {
   const toast = useToast()
   const [turmas, setTurmas] = useState([])
   const [disciplinas, setDisciplinas] = useState([])
+  const [professores, setProfessores] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [selectedTurma, setSelectedTurma] = useState(null)
@@ -43,8 +44,12 @@ export default function Turmas() {
   async function load() {
     try {
       setLoading(true); setError(null)
-      const [t, d] = await Promise.all([api.get('/turmas'), api.get('/disciplinas')])
-      setTurmas(t); setDisciplinas(d)
+      const [t, d, p] = await Promise.all([
+        api.get('/turmas'),
+        api.get('/disciplinas'),
+        api.get('/professores'),
+      ])
+      setTurmas(t); setDisciplinas(d); setProfessores(p)
       if (t.length && !selectedTurma) setSelectedTurma(t[0])
     } catch (e) { setError(e.message) }
     finally { setLoading(false) }
@@ -53,6 +58,11 @@ export default function Turmas() {
   useEffect(() => { load() }, [])
 
   const discForTurma = disciplinas.filter(d => d.turma_id === selectedTurma?.id)
+
+  function profName(professor_id) {
+    const p = professores.find(p => p.id === professor_id)
+    return p ? p.nome : '—'
+  }
 
   // ---- TURMA ----
   function openCreateTurma() { setTForm(EMPTY_TURMA); setTModal({ open: true, mode: 'create', data: null }) }
@@ -90,7 +100,12 @@ export default function Turmas() {
     setDModal({ open: true, mode: 'create', data: null })
   }
   function openEditDisc(d) {
-    setDForm({ ...d, carga_horaria: String(d.carga_horaria), turma_id: String(d.turma_id) })
+    setDForm({
+      ...d,
+      carga_horaria: String(d.carga_horaria),
+      turma_id: String(d.turma_id),
+      professor_id: d.professor_id ? String(d.professor_id) : '',
+    })
     setDModal({ open: true, mode: 'edit', data: d })
   }
 
@@ -100,7 +115,12 @@ export default function Turmas() {
     }
     try {
       setDSaving(true)
-      const payload = { ...dForm, carga_horaria: Number(dForm.carga_horaria), turma_id: Number(dForm.turma_id) }
+      const payload = {
+        ...dForm,
+        carga_horaria: Number(dForm.carga_horaria),
+        turma_id: Number(dForm.turma_id),
+        professor_id: dForm.professor_id ? Number(dForm.professor_id) : null,
+      }
       if (dModal.mode === 'create') { await api.post('/disciplinas', payload); toast('Disciplina criada!') }
       else { await api.put(`/disciplinas/${dModal.data.id}`, payload); toast('Disciplina atualizada!') }
       setDModal({ open: false }); load()
@@ -145,6 +165,11 @@ export default function Turmas() {
           <div className="stat-label">Disciplinas</div>
           <div className="stat-value" style={{ color: 'var(--primary)' }}>{disciplinas.length}</div>
           <div className="stat-sub">total no sistema</div>
+        </div>
+        <div className="stat-card">
+          <div className="stat-label">Professores</div>
+          <div className="stat-value" style={{ color: 'var(--success)' }}>{professores.filter(p => p.ativo).length}</div>
+          <div className="stat-sub">ativos</div>
         </div>
       </div>
 
@@ -224,13 +249,14 @@ export default function Turmas() {
                     <th>Disciplina</th>
                     <th>Código</th>
                     <th>Carga Horária</th>
+                    <th>Professor</th>
                     <th>Ações</th>
                   </tr>
                 </thead>
                 <tbody>
                   {discForTurma.length === 0 ? (
                     <tr>
-                      <td colSpan={4}>
+                      <td colSpan={5}>
                         <div className="state-box" style={{ padding: '32px' }}>
                           <p>Nenhuma disciplina nesta turma.</p>
                           <button className="btn btn-primary btn-sm" onClick={openCreateDisc}><PlusIcon /> Adicionar</button>
@@ -242,6 +268,9 @@ export default function Turmas() {
                       <td className="td-name">{d.nome}</td>
                       <td className="td-mono">{d.codigo}</td>
                       <td>{d.carga_horaria}h</td>
+                      <td style={{ fontSize: '13px', color: d.professor_id ? 'var(--text-1)' : 'var(--text-3)' }}>
+                        {profName(d.professor_id)}
+                      </td>
                       <td>
                         <div className="td-actions">
                           <button className="btn btn-ghost btn-sm" onClick={() => openEditDisc(d)}><EditIcon /></button>
@@ -317,6 +346,15 @@ export default function Turmas() {
             <select value={dForm.turma_id} onChange={e => setDForm(f => ({ ...f, turma_id: e.target.value }))}>
               <option value="">Selecione a turma</option>
               {turmas.map(t => <option key={t.id} value={t.id}>{t.nome}</option>)}
+            </select>
+          </div>
+          <div className="form-field full">
+            <label>Professor responsável</label>
+            <select value={dForm.professor_id} onChange={e => setDForm(f => ({ ...f, professor_id: e.target.value }))}>
+              <option value="">Sem professor vinculado</option>
+              {professores.filter(p => p.ativo).map(p => (
+                <option key={p.id} value={p.id}>{p.nome} — {p.especialidade}</option>
+              ))}
             </select>
           </div>
         </div>
