@@ -18,7 +18,7 @@ class PagamentoRepository:
     def get_byID(self, pagamento_id: int) -> ModelPagamento | None:
         return self.db.query(ModelPagamento).filter(ModelPagamento.id == pagamento_id).first()
 
-    def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelPagamento]:
+    def get_all(self, skip: int = 0, limit: int = 5000) -> list[ModelPagamento]:
         return self.db.query(ModelPagamento).offset(skip).limit(limit).all()
 
     def update(self, pagamento_id: int, dados: PagamentoUpdate) -> ModelPagamento | None:

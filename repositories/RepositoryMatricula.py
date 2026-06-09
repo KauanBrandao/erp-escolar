@@ -18,7 +18,7 @@ class MatriculaRepository:
     def get_byID(self, matricula_id: int) -> ModelMatricula | None:
         return self.db.query(ModelMatricula).filter(ModelMatricula.id == matricula_id).first()
 
-    def get_all(self, skip: int = 0, limit: int = 100) -> list[ModelMatricula]:
+    def get_all(self, skip: int = 0, limit: int = 5000) -> list[ModelMatricula]:
         return self.db.query(ModelMatricula).offset(skip).limit(limit).all()
 
     def update(self, matricula_id: int, dados: MatriculaUpdate) -> ModelMatricula | None:

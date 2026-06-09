@@ -12,8 +12,8 @@ class ServiceFrequencia:
     def buscar_por_id(self, obj_id: int):
         return self.repo.get_byID(obj_id)
 
-    def listar(self, skip: int = 0, limit: int = 100):
-        return self.repo.get_all(skip, limit)
+    def listar(self, skip: int = 0):
+        return self.repo.get_all(skip)
 
     def atualizar(self, obj_id: int, data):
         return self.repo.update(obj_id, data)

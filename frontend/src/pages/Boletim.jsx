@@ -18,11 +18,38 @@ function PlusIcon() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
 }
 
+function InfoPill({ label, value, accent }) {
+  return (
+    <div style={{
+      display: 'flex', flexDirection: 'column', gap: '2px',
+      padding: '10px 16px',
+      background: 'var(--bg-2)',
+      borderRadius: '8px',
+      borderLeft: accent ? `3px solid ${accent}` : '3px solid var(--border)',
+      minWidth: '100px',
+    }}>
+      <span style={{ fontSize: '11px', color: 'var(--text-3)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em' }}>{label}</span>
+      <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-1)' }}>{value || '—'}</span>
+    </div>
+  )
+}
+
+function fmt(v) {
+  if (v === null || v === undefined) return <span className="nota-cell nota-dash">—</span>
+  return <span className={`nota-cell ${nota_class(Number(v))}`}>{Number(v).toFixed(1)}</span>
+}
+
+function fmtVal(v) {
+  if (v === null || v === undefined) return '—'
+  return Number(v).toFixed(1)
+}
+
 export default function Boletim() {
   const toast = useToast()
   const [alunos, setAlunos] = useState([])
   const [disciplinas, setDisciplinas] = useState([])
   const [matriculas, setMatriculas] = useState([])
+  const [turmas, setTurmas] = useState([])
   const [notas, setNotas] = useState([])
   const [frequencias, setFrequencias] = useState([])
   const [loading, setLoading] = useState(true)
@@ -30,6 +57,7 @@ export default function Boletim() {
 
   const [selAluno, setSelAluno] = useState('')
   const [activeTab, setActiveTab] = useState('notas')
+  const [activeBim, setActiveBim] = useState(1)
 
   // modal nota
   const [nModal, setNModal] = useState({ open: false })
@@ -44,14 +72,15 @@ export default function Boletim() {
   async function load() {
     try {
       setLoading(true); setError(null)
-      const [a, d, m, n, f] = await Promise.all([
+      const [a, d, m, t, n, f] = await Promise.all([
         api.get('/alunos'),
         api.get('/disciplinas'),
         api.get('/matriculas'),
+        api.get('/turmas'),
         api.get('/notas'),
         api.get('/frequencias'),
       ])
-      setAlunos(a); setDisciplinas(d); setMatriculas(m); setNotas(n); setFrequencias(f)
+      setAlunos(a); setDisciplinas(d); setMatriculas(m); setTurmas(t); setNotas(n); setFrequencias(f)
       if (a.length && !selAluno) setSelAluno(String(a[0].id))
     } catch (e) { setError(e.message) }
     finally { setLoading(false) }
@@ -60,16 +89,17 @@ export default function Boletim() {
   useEffect(() => { load() }, [])
 
   const alunoId = Number(selAluno)
+  const alunoObj = alunos.find(a => a.id === alunoId)
   const alunoNotas = notas.filter(n => n.aluno_id === alunoId)
   const alunoFreqs = frequencias.filter(f => f.aluno_id === alunoId)
 
-  // Disciplinas apenas da turma do aluno selecionado (grid do boletim)
   const alunoMatricula = matriculas.find(m => m.aluno_id === alunoId)
+  const alunoTurma = turmas.find(t => t.id === alunoMatricula?.turma_id)
+
   const alunoDisciplinas = alunoMatricula
     ? disciplinas.filter(d => d.turma_id === alunoMatricula.turma_id)
     : disciplinas
 
-  // Disciplinas filtradas para os modais (baseadas no aluno escolhido dentro do modal)
   function getDiscipinasDoAluno(alunoIdStr) {
     const id = Number(alunoIdStr)
     const mat = matriculas.find(m => m.aluno_id === id)
@@ -78,11 +108,10 @@ export default function Boletim() {
   const nModalDiscs = getDiscipinasDoAluno(nForm.aluno_id)
   const fModalDiscs = getDiscipinasDoAluno(fForm.aluno_id)
 
-  // Agrupar notas por disciplina + bimestre
+  // Build nota grid
   function getNotaGrid() {
     const bimestres = [1, 2, 3, 4]
     const tipos = ['prova', 'trabalho', 'recuperacao']
-
     return alunoDisciplinas.map(disc => {
       const row = { disc }
       bimestres.forEach(b => {
@@ -99,23 +128,21 @@ export default function Boletim() {
       row.media_geral = allNotas.length
         ? allNotas.reduce((s, n) => s + Number(n.valor), 0) / allNotas.length
         : null
-
-      // Frequência
       const discFreqs = alunoFreqs.filter(f => f.disciplina_id === disc.id)
       row.freq_total = discFreqs.length
       row.freq_presentes = discFreqs.filter(f => f.presente).length
       row.freq_pct = discFreqs.length ? Math.round(row.freq_presentes / discFreqs.length * 100) : null
-
       return row
     })
   }
 
   const notaGrid = getNotaGrid()
 
-  function fmt(v) {
-    if (v === null || v === undefined) return <span className="nota-cell nota-dash">—</span>
-    return <span className={`nota-cell ${nota_class(Number(v))}`}>{Number(v).toFixed(1)}</span>
-  }
+  // Frequência stats
+  const freqTotal = alunoFreqs.length
+  const freqPresentes = alunoFreqs.filter(f => f.presente).length
+  const freqFaltas = freqTotal - freqPresentes
+  const freqPct = freqTotal ? Math.round(freqPresentes / freqTotal * 100) : null
 
   // ---- SALVAR NOTA ----
   async function saveNota() {
@@ -157,9 +184,16 @@ export default function Boletim() {
 
   if (error) return <ErrorBox message={error} onRetry={load} />
 
+  const statusMatricula = alunoMatricula?.status
+  const statusColor = statusMatricula === 'ativa' ? 'var(--success)' : statusMatricula === 'trancada' ? 'var(--warning)' : 'var(--danger)'
+
+  const nascFormatted = alunoObj?.data_nascimento
+    ? new Date(alunoObj.data_nascimento + 'T12:00:00').toLocaleDateString('pt-BR')
+    : '—'
+
   return (
     <>
-      {/* Controls */}
+      {/* Selector */}
       <div className="card" style={{ padding: '16px 20px' }}>
         <div className="boletim-controls">
           <div style={{ flex: 1, minWidth: '200px', maxWidth: '340px' }}>
@@ -181,6 +215,47 @@ export default function Boletim() {
         </div>
       </div>
 
+      {/* Student Info Panel */}
+      {alunoObj && !loading && (
+        <div className="card" style={{ padding: '16px 20px' }}>
+          <div style={{ marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '36px', height: '36px', borderRadius: '50%',
+              background: 'var(--primary)', color: '#fff',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              fontWeight: 700, fontSize: '15px', flexShrink: 0,
+            }}>
+              {alunoObj.nome.charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div style={{ fontWeight: 700, fontSize: '15px', color: 'var(--text-1)' }}>{alunoObj.nome}</div>
+              <div style={{ fontSize: '12px', color: 'var(--text-3)' }}>
+                {alunoObj.ativo ? 'Aluno ativo' : 'Aluno inativo'}
+              </div>
+            </div>
+            {statusMatricula && (
+              <span style={{
+                marginLeft: 'auto',
+                padding: '3px 10px', borderRadius: '99px',
+                fontSize: '12px', fontWeight: 600,
+                background: statusColor + '22', color: statusColor,
+              }}>
+                Matrícula {statusMatricula}
+              </span>
+            )}
+          </div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+            <InfoPill label="Matrícula" value={`#${alunoObj.matricula_numero}`} accent="var(--primary)" />
+            <InfoPill label="Turma" value={alunoTurma?.nome} accent="var(--info, #3b82f6)" />
+            <InfoPill label="Série" value={alunoTurma?.serie} />
+            <InfoPill label="Turno" value={alunoTurma?.turno} />
+            <InfoPill label="Ano Letivo" value={alunoTurma?.ano_letivo} />
+            <InfoPill label="Nascimento" value={nascFormatted} />
+            <InfoPill label="Disciplinas" value={alunoDisciplinas.length} />
+          </div>
+        </div>
+      )}
+
       {/* Tabs */}
       <div style={{ display: 'flex', gap: '4px', borderBottom: '2px solid var(--border)', paddingBottom: '0' }}>
         {['notas', 'frequencia'].map(tab => (
@@ -201,107 +276,219 @@ export default function Boletim() {
 
       {/* Notas */}
       {activeTab === 'notas' && (
-        <div className="card">
-          <div className="table-wrap">
-            <table className="boletim-table">
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left' }}>Disciplina</th>
-                  {[1,2,3,4].map(b => (
-                    <th key={b} colSpan={3}>{b}° Bim</th>
-                  ))}
-                  <th>Média Final</th>
-                  <th>Freq.</th>
-                </tr>
-                <tr>
-                  <th></th>
-                  {[1,2,3,4].map(b => (
-                    <>
-                      <th key={`${b}_p`} style={{ fontSize: '10px', color: 'var(--text-3)' }}>Prova</th>
-                      <th key={`${b}_t`} style={{ fontSize: '10px', color: 'var(--text-3)' }}>Trab.</th>
-                      <th key={`${b}_r`} style={{ fontSize: '10px', color: 'var(--text-3)' }}>Recup.</th>
-                    </>
-                  ))}
-                  <th></th>
-                  <th></th>
-                </tr>
-              </thead>
-              {loading ? <Loading rows={6} /> : (
-                <tbody>
-                  {notaGrid.length === 0 ? (
-                    <tr><td colSpan={12} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-3)' }}>
-                      Selecione um aluno para ver o boletim.
-                    </td></tr>
-                  ) : notaGrid.map(row => (
-                    <tr key={row.disc.id}>
-                      <td className="td-name">{row.disc.nome}</td>
-                      {[1,2,3,4].map(b => (
-                        <>
-                          <td key={`${b}_p`}>{fmt(row[`${b}_prova`])}</td>
-                          <td key={`${b}_t`}>{fmt(row[`${b}_trabalho`])}</td>
-                          <td key={`${b}_r`}>{fmt(row[`${b}_recuperacao`])}</td>
-                        </>
-                      ))}
-                      <td>
-                        <strong className={`nota-cell ${nota_class(row.media_geral)}`}>
-                          {row.media_geral !== null ? Number(row.media_geral).toFixed(1) : '—'}
-                        </strong>
-                      </td>
-                      <td>
-                        {row.freq_pct !== null ? (
-                          <span className={`nota-cell ${row.freq_pct >= 75 ? 'nota-good' : 'nota-bad'}`}>
-                            {row.freq_pct}%
-                          </span>
-                        ) : <span className="nota-cell nota-dash">—</span>}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              )}
-            </table>
+        <>
+          {/* Bimestre sub-tabs */}
+          <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+            {[1,2,3,4].map(b => (
+              <button key={b} onClick={() => setActiveBim(b)} style={{
+                padding: '7px 18px', borderRadius: '8px',
+                border: activeBim === b ? '2px solid var(--primary)' : '2px solid var(--border)',
+                background: activeBim === b ? 'var(--primary)' : 'var(--card-bg)',
+                color: activeBim === b ? '#fff' : 'var(--text-2)',
+                fontWeight: 600, fontSize: '13px', cursor: 'pointer',
+                fontFamily: 'Plus Jakarta Sans, sans-serif',
+                transition: 'all .15s',
+              }}>{b}° Bimestre</button>
+            ))}
+            <button onClick={() => setActiveBim(0)} style={{
+              padding: '7px 18px', borderRadius: '8px',
+              border: activeBim === 0 ? '2px solid var(--primary)' : '2px solid var(--border)',
+              background: activeBim === 0 ? 'var(--primary)' : 'var(--card-bg)',
+              color: activeBim === 0 ? '#fff' : 'var(--text-2)',
+              fontWeight: 600, fontSize: '13px', cursor: 'pointer',
+              fontFamily: 'Plus Jakarta Sans, sans-serif',
+              transition: 'all .15s',
+            }}>Resumo Geral</button>
           </div>
-        </div>
+
+          {/* Bimestre detail view */}
+          {activeBim > 0 && (
+            <div className="card">
+              <div className="card-header" style={{ marginBottom: '0' }}>
+                <div>
+                  <div className="card-title">{activeBim}° Bimestre</div>
+                  {!loading && (
+                    <div className="card-count">
+                      {notaGrid.filter(r => r[`${activeBim}_prova`] !== null || r[`${activeBim}_trabalho`] !== null).length} de {notaGrid.length} disciplinas com notas
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="table-wrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left' }}>Disciplina</th>
+                      <th>Prova</th>
+                      <th>Trabalho</th>
+                      <th>Recuperação</th>
+                      <th>Média do Bimestre</th>
+                    </tr>
+                  </thead>
+                  {loading ? <Loading rows={6} /> : (
+                    <tbody>
+                      {notaGrid.length === 0 ? (
+                        <tr><td colSpan={5} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-3)' }}>
+                          Selecione um aluno para ver o boletim.
+                        </td></tr>
+                      ) : notaGrid.map(row => (
+                        <tr key={row.disc.id}>
+                          <td className="td-name">{row.disc.nome}</td>
+                          <td>{fmt(row[`${activeBim}_prova`])}</td>
+                          <td>{fmt(row[`${activeBim}_trabalho`])}</td>
+                          <td>{fmt(row[`${activeBim}_recuperacao`])}</td>
+                          <td>
+                            {row[`${activeBim}_media`] !== null ? (
+                              <strong className={`nota-cell ${nota_class(row[`${activeBim}_media`])}`}>
+                                {Number(row[`${activeBim}_media`]).toFixed(1)}
+                              </strong>
+                            ) : <span className="nota-cell nota-dash">—</span>}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  )}
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* Resumo Geral */}
+          {activeBim === 0 && (
+            <div className="card">
+              <div className="card-header" style={{ marginBottom: '0' }}>
+                <div>
+                  <div className="card-title">Resumo Geral — Médias por Bimestre</div>
+                  {!loading && <div className="card-count">{notaGrid.length} disciplinas</div>}
+                </div>
+              </div>
+              <div className="table-wrap">
+                <table className="boletim-table">
+                  <thead>
+                    <tr>
+                      <th style={{ textAlign: 'left' }}>Disciplina</th>
+                      <th>1° Bim</th>
+                      <th>2° Bim</th>
+                      <th>3° Bim</th>
+                      <th>4° Bim</th>
+                      <th>Média Final</th>
+                      <th>Freq.</th>
+                      <th>Situação</th>
+                    </tr>
+                  </thead>
+                  {loading ? <Loading rows={6} /> : (
+                    <tbody>
+                      {notaGrid.length === 0 ? (
+                        <tr><td colSpan={8} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-3)' }}>
+                          Selecione um aluno para ver o boletim.
+                        </td></tr>
+                      ) : notaGrid.map(row => {
+                        const aprovado = row.media_geral !== null && row.media_geral >= 7 &&
+                          (row.freq_pct === null || row.freq_pct >= 75)
+                        const reprovado = row.media_geral !== null && (row.media_geral < 5 || row.freq_pct < 75)
+                        const situacao = row.media_geral === null ? null : aprovado ? 'Aprovado' : reprovado ? 'Reprovado' : 'Recuperação'
+                        const sitColor = situacao === 'Aprovado' ? 'nota-good' : situacao === 'Reprovado' ? 'nota-bad' : 'nota-warn'
+                        return (
+                          <tr key={row.disc.id}>
+                            <td className="td-name">{row.disc.nome}</td>
+                            <td>{fmt(row['1_media'])}</td>
+                            <td>{fmt(row['2_media'])}</td>
+                            <td>{fmt(row['3_media'])}</td>
+                            <td>{fmt(row['4_media'])}</td>
+                            <td>
+                              {row.media_geral !== null ? (
+                                <strong className={`nota-cell ${nota_class(row.media_geral)}`}>
+                                  {Number(row.media_geral).toFixed(1)}
+                                </strong>
+                              ) : <span className="nota-cell nota-dash">—</span>}
+                            </td>
+                            <td>
+                              {row.freq_pct !== null ? (
+                                <span className={`nota-cell ${row.freq_pct >= 75 ? 'nota-good' : 'nota-bad'}`}>
+                                  {row.freq_pct}%
+                                </span>
+                              ) : <span className="nota-cell nota-dash">—</span>}
+                            </td>
+                            <td>
+                              {situacao ? (
+                                <span className={`nota-cell ${sitColor}`} style={{ fontWeight: 600 }}>
+                                  {situacao}
+                                </span>
+                              ) : <span className="nota-cell nota-dash">—</span>}
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  )}
+                </table>
+              </div>
+            </div>
+          )}
+        </>
       )}
 
       {/* Frequência detalhada */}
       {activeTab === 'frequencia' && (
-        <div className="card">
-          <div className="table-wrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Data</th>
-                  <th>Disciplina</th>
-                  <th>Situação</th>
-                  <th>Justificativa</th>
-                </tr>
-              </thead>
-              {loading ? <Loading rows={6} /> : (
-                <tbody>
-                  {alunoFreqs.length === 0 ? (
-                    <tr><td colSpan={4} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-3)' }}>
-                      Nenhuma frequência registrada para este aluno.
-                    </td></tr>
-                  ) : alunoFreqs.sort((a, b) => b.data_aula?.localeCompare(a.data_aula)).map(f => {
-                    const disc = disciplinas.find(d => d.id === f.disciplina_id)
-                    return (
-                      <tr key={f.id}>
-                        <td className="td-mono">{f.data_aula}</td>
-                        <td>{disc?.nome || '—'}</td>
-                        <td>
-                          <span className={`badge ${f.presente ? 'badge-success' : 'badge-danger'}`}>
-                            {f.presente ? 'Presente' : 'Ausente'}
-                          </span>
-                        </td>
-                        <td style={{ color: 'var(--text-2)', fontSize: '13px' }}>{f.justificativa || '—'}</td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              )}
-            </table>
+        <>
+          {/* Frequência summary */}
+          {!loading && freqTotal > 0 && (
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {[
+                { label: 'Total de Aulas', value: freqTotal, accent: 'var(--primary)' },
+                { label: 'Presenças', value: freqPresentes, accent: 'var(--success)' },
+                { label: 'Faltas', value: freqFaltas, accent: freqFaltas > 0 ? 'var(--danger)' : 'var(--border)' },
+                { label: '% Frequência', value: freqPct !== null ? `${freqPct}%` : '—', accent: freqPct >= 75 ? 'var(--success)' : 'var(--danger)' },
+              ].map(item => (
+                <div key={item.label} className="card" style={{
+                  flex: '1', minWidth: '130px', padding: '14px 18px',
+                  borderTop: `3px solid ${item.accent}`,
+                }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-3)', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{item.label}</div>
+                  <div style={{ fontSize: '22px', fontWeight: 700, color: item.accent }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="card">
+            <div className="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Data</th>
+                    <th>Disciplina</th>
+                    <th>Situação</th>
+                    <th>Justificativa</th>
+                  </tr>
+                </thead>
+                {loading ? <Loading rows={6} /> : (
+                  <tbody>
+                    {alunoFreqs.length === 0 ? (
+                      <tr><td colSpan={4} style={{ textAlign: 'center', padding: '40px', color: 'var(--text-3)' }}>
+                        Nenhuma frequência registrada para este aluno.
+                      </td></tr>
+                    ) : alunoFreqs.sort((a, b) => b.data_aula?.localeCompare(a.data_aula)).map(f => {
+                      const disc = disciplinas.find(d => d.id === f.disciplina_id)
+                      return (
+                        <tr key={f.id}>
+                          <td className="td-mono">{f.data_aula}</td>
+                          <td>{disc?.nome || '—'}</td>
+                          <td>
+                            <span className={`badge ${f.presente ? 'badge-success' : 'badge-danger'}`}>
+                              {f.presente ? 'Presente' : 'Ausente'}
+                            </span>
+                          </td>
+                          <td style={{ color: 'var(--text-2)', fontSize: '13px' }}>{f.justificativa || '—'}</td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                )}
+              </table>
+            </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* Modal Nota */}
