@@ -1,6 +1,10 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
+from models.ModelDisciplina import ModelDisciplina
+from models.ModelFrequencia import ModelFrequencia
+from models.ModelMatricula import ModelMatricula
+from models.ModelNota import ModelNota
 from repositories.RepositoryTurma import TurmaRepository
 from schemas.SchemaTurma import TurmaCreate, TurmaUpdate
 
@@ -28,7 +32,33 @@ class ServiceTurma:
         return turma
 
     def deletar(self, turma_id: int):
-        sucesso = self.repository.delete(turma_id)
-        if not sucesso:
+        if not self.repository.get_byID(turma_id):
             raise HTTPException(status_code=404, detail="Turma não encontrada")
+
+        db = self.repository.db
+
+        # Disciplinas desta turma
+        disc_ids = [
+            d.id for d in db.query(ModelDisciplina)
+            .filter(ModelDisciplina.turma_id == turma_id).all()
+        ]
+
+        if disc_ids:
+            db.query(ModelNota).filter(
+                ModelNota.disciplina_id.in_(disc_ids)
+            ).delete(synchronize_session=False)
+            db.query(ModelFrequencia).filter(
+                ModelFrequencia.disciplina_id.in_(disc_ids)
+            ).delete(synchronize_session=False)
+            db.query(ModelDisciplina).filter(
+                ModelDisciplina.turma_id == turma_id
+            ).delete(synchronize_session=False)
+
+        db.query(ModelMatricula).filter(
+            ModelMatricula.turma_id == turma_id
+        ).delete(synchronize_session=False)
+
+        db.commit()
+
+        self.repository.delete(turma_id)
         return {"mensagem": "Turma deletada com sucesso"}
