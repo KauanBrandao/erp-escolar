@@ -28,6 +28,8 @@ PROFILE_PERMISSIONS = {
         "turmas:write",
         "matriculas:read",
         "matriculas:write",
+        "professores:read",
+        "professores:write",
     },
     "coordenacao_pedagogica": {
         "alunos:read",
@@ -41,6 +43,7 @@ PROFILE_PERMISSIONS = {
         "frequencias:write",
         "comunicados:read",
         "comunicados:write",
+        "professores:read",
     },
     "financeiro": {
         "mensalidades:read",

@@ -9,6 +9,7 @@ import Boletim from './pages/Boletim'
 import Financeiro from './pages/Financeiro'
 import Comunicados from './pages/Comunicados'
 import Usuarios from './pages/Usuarios'
+import Professores from './pages/Professores'
 import Login from './pages/Login'
 import { setToken } from './api/client'
 
@@ -20,6 +21,7 @@ const PAGES = {
   financeiro:  { title: 'Financeiro',              component: Financeiro  },
   comunicados: { title: 'Comunicados',             component: Comunicados },
   usuarios:    { title: 'Usuários',                component: Usuarios    },
+  professores: { title: 'Professores',             component: Professores },
 }
 
 export default function App() {

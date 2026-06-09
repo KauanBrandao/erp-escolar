@@ -9,4 +9,5 @@ class ModelDisciplina(Base):
     codigo = Column(String(20), nullable=False, unique=True)
     carga_horaria = Column(Integer, nullable=False)
     turma_id = Column(Integer, ForeignKey("Turmas.id"), nullable=False)
+    professor_id = Column(Integer, ForeignKey("Professores.id"), nullable=True)
     
