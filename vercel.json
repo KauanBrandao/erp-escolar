@@ -1,34 +1,27 @@
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
-    },
-    {
-      "src": "api/index.py",
-      "use": "@vercel/python",
-      "config": { "runtime": "python3.12" }
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "functions": {
+    "api/index.py": {
+      "runtime": "python3.12"
     }
-  ],
-  "routes": [
-    { "src": "/auth(.*)", "dest": "/api/index.py" },
-    { "src": "/alunos(.*)", "dest": "/api/index.py" },
-    { "src": "/turmas(.*)", "dest": "/api/index.py" },
-    { "src": "/matriculas(.*)", "dest": "/api/index.py" },
-    { "src": "/notas(.*)", "dest": "/api/index.py" },
-    { "src": "/comunicados(.*)", "dest": "/api/index.py" },
-    { "src": "/disciplinas(.*)", "dest": "/api/index.py" },
-    { "src": "/frequencias(.*)", "dest": "/api/index.py" },
-    { "src": "/mensalidades(.*)", "dest": "/api/index.py" },
-    { "src": "/pagamentos(.*)", "dest": "/api/index.py" },
-    { "src": "/perfis(.*)", "dest": "/api/index.py" },
-    { "src": "/responsaveis(.*)", "dest": "/api/index.py" },
-    { "src": "/usuarios(.*)", "dest": "/api/index.py" },
-    { "src": "/docs(.*)", "dest": "/api/index.py" },
-    { "src": "/openapi.json", "dest": "/api/index.py" },
-    { "handle": "filesystem" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  },
+  "rewrites": [
+    { "source": "/auth/:path*", "destination": "/api/index.py" },
+    { "source": "/alunos/:path*", "destination": "/api/index.py" },
+    { "source": "/turmas/:path*", "destination": "/api/index.py" },
+    { "source": "/matriculas/:path*", "destination": "/api/index.py" },
+    { "source": "/notas/:path*", "destination": "/api/index.py" },
+    { "source": "/comunicados/:path*", "destination": "/api/index.py" },
+    { "source": "/disciplinas/:path*", "destination": "/api/index.py" },
+    { "source": "/frequencias/:path*", "destination": "/api/index.py" },
+    { "source": "/mensalidades/:path*", "destination": "/api/index.py" },
+    { "source": "/pagamentos/:path*", "destination": "/api/index.py" },
+    { "source": "/perfis/:path*", "destination": "/api/index.py" },
+    { "source": "/responsaveis/:path*", "destination": "/api/index.py" },
+    { "source": "/usuarios/:path*", "destination": "/api/index.py" },
+    { "source": "/docs/:path*", "destination": "/api/index.py" },
+    { "source": "/openapi.json", "destination": "/api/index.py" },
+    { "source": "/:path*", "destination": "/index.html" }
   ]
 }
