@@ -74,9 +74,9 @@ export default function Financeiro() {
     return matchSearch && matchStatus && matchMes
   })
 
-  // Resumo financeiro
-  const totalValor = mensalidades.reduce((s, m) => s + m.valor, 0)
-  const totalRecebido = mensalidades.reduce((s, m) => {
+  // Resumo financeiro — baseado nos registros filtrados
+  const totalValor = filtered.reduce((s, m) => s + m.valor, 0)
+  const totalRecebido = filtered.reduce((s, m) => {
     const p = getPagamento(m.id)
     return s + (p ? Number(p.valor_pago) : 0)
   }, 0)
@@ -151,7 +151,7 @@ export default function Financeiro() {
           <div className="fin-label">Pendente / Em Atraso</div>
           <div className="fin-value red">{fmt(totalPendente)}</div>
           <div className="fin-sub">
-            {mensalidades.filter(m => getMensStatus(m) === 'atrasado').length} em atraso
+            {filtered.filter(m => getMensStatus(m) === 'atrasado').length} em atraso
           </div>
         </div>
       </div>
