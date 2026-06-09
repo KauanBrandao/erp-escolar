@@ -75,6 +75,7 @@ export default function Financeiro() {
   })
 
   // Resumo financeiro — baseado nos registros filtrados
+  console.log('[Financeiro] filterMes:', filterMes, '| filtered.length:', filtered.length, '| mensalidades[0]?.mes typeof:', typeof mensalidades[0]?.mes)
   const totalValor = filtered.reduce((s, m) => s + m.valor, 0)
   const totalRecebido = filtered.reduce((s, m) => {
     const p = getPagamento(m.id)
