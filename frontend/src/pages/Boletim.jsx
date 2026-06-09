@@ -22,6 +22,7 @@ export default function Boletim() {
   const toast = useToast()
   const [alunos, setAlunos] = useState([])
   const [disciplinas, setDisciplinas] = useState([])
+  const [matriculas, setMatriculas] = useState([])
   const [notas, setNotas] = useState([])
   const [frequencias, setFrequencias] = useState([])
   const [loading, setLoading] = useState(true)
@@ -43,13 +44,14 @@ export default function Boletim() {
   async function load() {
     try {
       setLoading(true); setError(null)
-      const [a, d, n, f] = await Promise.all([
+      const [a, d, m, n, f] = await Promise.all([
         api.get('/alunos'),
         api.get('/disciplinas'),
+        api.get('/matriculas'),
         api.get('/notas'),
         api.get('/frequencias'),
       ])
-      setAlunos(a); setDisciplinas(d); setNotas(n); setFrequencias(f)
+      setAlunos(a); setDisciplinas(d); setMatriculas(m); setNotas(n); setFrequencias(f)
       if (a.length && !selAluno) setSelAluno(String(a[0].id))
     } catch (e) { setError(e.message) }
     finally { setLoading(false) }
@@ -61,12 +63,18 @@ export default function Boletim() {
   const alunoNotas = notas.filter(n => n.aluno_id === alunoId)
   const alunoFreqs = frequencias.filter(f => f.aluno_id === alunoId)
 
+  // Disciplinas apenas da turma do aluno selecionado
+  const alunoMatricula = matriculas.find(m => m.aluno_id === alunoId)
+  const alunoDisciplinas = alunoMatricula
+    ? disciplinas.filter(d => d.turma_id === alunoMatricula.turma_id)
+    : disciplinas
+
   // Agrupar notas por disciplina + bimestre
   function getNotaGrid() {
     const bimestres = [1, 2, 3, 4]
     const tipos = ['prova', 'trabalho', 'recuperacao']
 
-    return disciplinas.map(disc => {
+    return alunoDisciplinas.map(disc => {
       const row = { disc }
       bimestres.forEach(b => {
         tipos.forEach(tipo => {
