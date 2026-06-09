@@ -3,6 +3,16 @@ import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
+from starlette.middleware.base import BaseHTTPMiddleware
+
+
+class TrailingSlashMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        path = request.scope.get("path", "")
+        if path.startswith("/api/") and not path.endswith("/"):
+            request.scope["path"] = path + "/"
+            request.scope["raw_path"] = (path + "/").encode()
+        return await call_next(request)
 
 from core.database import Base, engine
 from routers.RouterAluno import router as aluno_router
@@ -23,7 +33,7 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="ERP Escolar")
 
-#Configurar para a url do frontend
+app.add_middleware(TrailingSlashMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -62,6 +72,8 @@ def serve_assets(file_path: str):
 
 @app.get("/{full_path:path}", include_in_schema=False)
 def serve_frontend(full_path: str):
+    if full_path.startswith("api/") or full_path == "api":
+        raise HTTPException(status_code=404, detail="API endpoint not found")
     index = os.path.join(_DIST, "index.html")
     if not os.path.isfile(index):
         raise HTTPException(status_code=404, detail=f"index.html not found at {index}")
