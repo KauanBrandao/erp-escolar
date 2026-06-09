@@ -24,13 +24,11 @@ from models.ModelMensalidade import ModelMensalidade
 from models.ModelPagamento import ModelPagamento
 from models.ModelComunicado import ModelComunicado
 
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import bcrypt
 
 
 def hash_senha(senha: str) -> str:
-    return pwd_context.hash(senha)
+    return bcrypt.hashpw(senha.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
 
 def main():
@@ -277,10 +275,10 @@ def main():
         print(f"  {len(matriculas_map)} matrículas OK")
 
         # ── 8. NOTAS ─────────────────────────────────────────────────
-        print("Inserindo notas...")
+        # Boletim completo: prova + trabalho + recuperacao por bimestre
+        print("Inserindo notas (boletim completo ano letivo 2025)...")
         random.seed(42)
         notas_count = 0
-        tipos = ["prova", "trabalho", "prova", "recuperacao"]
         bimestre_dates = {
             1: date(2025, 3, 20),
             2: date(2025, 5, 30),
@@ -288,34 +286,61 @@ def main():
             4: date(2025, 10, 30),
         }
 
-        for aluno_idx, (turma_idx, aluno_idxs) in enumerate(turma_dist):
+        for turma_idx, aluno_idxs in turma_dist:
             turma = turmas[turma_idx]
             discs = disciplinas[turma.id]
             for ai in aluno_idxs:
                 aluno = alunos[ai]
                 for disc in discs:
+                    # Apaga todas as notas existentes para este aluno+disciplina
+                    db.query(ModelNota).filter_by(
+                        aluno_id=aluno.id,
+                        disciplina_id=disc.id,
+                    ).delete()
+                    db.flush()
+
                     for bim in range(1, 5):
-                        existe = db.query(ModelNota).filter_by(
+                        # Prova: maioria boa (6-10), alguns com dificuldade (3-6)
+                        prova = round(random.choices(
+                            [random.uniform(3, 5.9), random.uniform(6, 7.9), random.uniform(8, 10)],
+                            weights=[0.18, 0.40, 0.42],
+                        )[0], 1)
+
+                        # Trabalho: ligeiramente melhor que prova
+                        trabalho = round(min(10, prova + random.uniform(-0.5, 2.0)), 1)
+
+                        db.add(ModelNota(
+                            valor=prova,
+                            tipo="prova",
+                            bimestre=bim,
+                            lancado_em=bimestre_dates[bim],
                             aluno_id=aluno.id,
                             disciplina_id=disc.id,
+                        ))
+                        db.add(ModelNota(
+                            valor=trabalho,
+                            tipo="trabalho",
                             bimestre=bim,
-                        ).first()
-                        if not existe:
-                            # Notas realistas: maioria entre 5 e 10
-                            base = random.choices(
-                                [random.uniform(3, 5), random.uniform(5, 7), random.uniform(7, 10)],
-                                weights=[0.15, 0.35, 0.50],
-                            )[0]
-                            nota = ModelNota(
-                                valor=round(base, 2),
-                                tipo=tipos[bim - 1],
+                            lancado_em=bimestre_dates[bim],
+                            aluno_id=aluno.id,
+                            disciplina_id=disc.id,
+                        ))
+                        notas_count += 2
+
+                        # Recuperação: apenas se média prova+trabalho < 7
+                        media_bim = (prova + trabalho) / 2
+                        if media_bim < 7:
+                            recuperacao = round(random.uniform(4.5, 8.5), 1)
+                            db.add(ModelNota(
+                                valor=recuperacao,
+                                tipo="recuperacao",
                                 bimestre=bim,
                                 lancado_em=bimestre_dates[bim],
                                 aluno_id=aluno.id,
                                 disciplina_id=disc.id,
-                            )
-                            db.add(nota)
+                            ))
                             notas_count += 1
+
         db.commit()
         print(f"  {notas_count} notas OK")
 
@@ -363,19 +388,19 @@ def main():
         formas_pag = ["PIX", "Boleto", "Cartão de Débito", "Cartão de Crédito"]
 
         for aluno in alunos:
-            for mes in range(2, 7):  # fev a jun/2025
+            for mes in range(2, 12):  # fev a nov/2025 (ano letivo completo)
                 existe = db.query(ModelMensalidade).filter_by(
                     aluno_id=aluno.id, mes=mes, ano=2025
                 ).first()
                 if not existe:
                     vencimento = date(2025, mes, 10)
-                    # Status: pago=past months, pendente=current, atrasado=some
-                    if mes <= 4:
+                    # Simula final de novembro: fev-set=pago, out=mix, nov=pendente/atrasado
+                    if mes <= 9:
                         status = "pago"
-                    elif mes == 5:
-                        status = random.choice(["pago", "pendente", "atrasado"])
-                    else:
-                        status = random.choice(["pendente", "atrasado"])
+                    elif mes == 10:
+                        status = random.choices(["pago", "atrasado"], weights=[0.75, 0.25])[0]
+                    else:  # nov
+                        status = random.choices(["pago", "pendente", "atrasado"], weights=[0.35, 0.40, 0.25])[0]
 
                     m = ModelMensalidade(
                         aluno_id=aluno.id,
@@ -487,7 +512,7 @@ def main():
         db.commit()
         print(f"  {com_count} comunicados OK")
 
-        print("\n✓ Seed concluído com sucesso!")
+        print("\nSeed concluido com sucesso!")
         print(f"  Perfis: {len(perfis)}")
         print(f"  Usuários: {len(usuarios)}")
         print(f"  Turmas: {len(turmas)}")

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
 import { ToastProvider } from './components/Toast'
+import Dashboard from './pages/Dashboard'
 import Alunos from './pages/Alunos'
 import Turmas from './pages/Turmas'
 import Boletim from './pages/Boletim'
@@ -12,6 +13,7 @@ import Login from './pages/Login'
 import { setToken } from './api/client'
 
 const PAGES = {
+  dashboard:   { title: 'Dashboard',              component: Dashboard   },
   alunos:      { title: 'Alunos & Matrículas',    component: Alunos      },
   turmas:      { title: 'Turmas & Disciplinas',    component: Turmas      },
   boletim:     { title: 'Boletim & Frequência',    component: Boletim     },
@@ -22,7 +24,7 @@ const PAGES = {
 
 export default function App() {
   const [authed, setAuthed] = useState(!!localStorage.getItem('token'))
-  const [current, setCurrent] = useState('alunos')
+  const [current, setCurrent] = useState('dashboard')
 
   useEffect(() => {
     function onLogout() { setAuthed(false) }
