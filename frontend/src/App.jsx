@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Sidebar from './components/Sidebar'
 import Topbar from './components/Topbar'
 import { ToastProvider } from './components/Toast'
@@ -8,6 +8,8 @@ import Boletim from './pages/Boletim'
 import Financeiro from './pages/Financeiro'
 import Comunicados from './pages/Comunicados'
 import Usuarios from './pages/Usuarios'
+import Login from './pages/Login'
+import { setToken } from './api/client'
 
 const PAGES = {
   alunos:      { title: 'Alunos & Matrículas',    component: Alunos      },
@@ -19,15 +21,27 @@ const PAGES = {
 }
 
 export default function App() {
+  const [authed, setAuthed] = useState(!!localStorage.getItem('token'))
   const [current, setCurrent] = useState('alunos')
-  const Page = PAGES[current]?.component
 
+  useEffect(() => {
+    function onLogout() { setAuthed(false) }
+    window.addEventListener('auth:logout', onLogout)
+    return () => window.removeEventListener('auth:logout', onLogout)
+  }, [])
+
+  function handleLogin() { setAuthed(true) }
+  function handleLogout() { setToken(null); setAuthed(false) }
+
+  if (!authed) return <Login onLogin={handleLogin} />
+
+  const Page = PAGES[current]?.component
   return (
     <ToastProvider>
       <div className="layout">
         <Sidebar current={current} onNavigate={setCurrent} />
         <div className="main">
-          <Topbar title={PAGES[current]?.title} />
+          <Topbar title={PAGES[current]?.title} onLogout={handleLogout} />
           <div className="content">
             {Page && <Page key={current} />}
           </div>

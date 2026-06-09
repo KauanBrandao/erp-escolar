@@ -1,10 +1,21 @@
 const BASE = (import.meta.env.VITE_API_URL ?? '') + '/api'
 
+function getToken() {
+  return localStorage.getItem('token')
+}
+
+export function setToken(token) {
+  if (token) localStorage.setItem('token', token)
+  else localStorage.removeItem('token')
+}
+
 async function request(method, path, body = null) {
-  const opts = {
-    method,
-    headers: body ? { 'Content-Type': 'application/json' } : {},
-  }
+  const token = getToken()
+  const headers = {}
+  if (body) headers['Content-Type'] = 'application/json'
+  if (token) headers['Authorization'] = `Bearer ${token}`
+
+  const opts = { method, headers }
   if (body) opts.body = JSON.stringify(body)
 
   let res
@@ -15,6 +26,12 @@ async function request(method, path, body = null) {
   }
 
   if (res.status === 204) return null
+
+  if (res.status === 401) {
+    setToken(null)
+    window.dispatchEvent(new Event('auth:logout'))
+    throw new Error('Sessão expirada. Faça login novamente.')
+  }
 
   const data = await res.json().catch(() => ({}))
 
