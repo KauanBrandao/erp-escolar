@@ -30,6 +30,9 @@ PROFILE_PERMISSIONS = {
         "matriculas:write",
     },
     "coordenacao_pedagogica": {
+        "alunos:read",
+        "turmas:read",
+        "matriculas:read",
         "disciplinas:read",
         "disciplinas:write",
         "notas:read",
