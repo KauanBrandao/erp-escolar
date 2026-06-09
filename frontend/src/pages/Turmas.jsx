@@ -128,16 +128,14 @@ export default function Turmas() {
         <div className="stat-card">
           <div className="stat-label">Total de Turmas</div>
           <div className="stat-value">{turmas.length}</div>
-          <div className="stat-sub">ano letivo ativo</div>
+          <div className="stat-sub">{[...new Set(turmas.map(t => t.ano_letivo))].sort((a,b) => b-a).join(', ')}</div>
         </div>
-        <div className="stat-card">
-          <div className="stat-label">Matutino</div>
-          <div className="stat-value">{turmas.filter(t => t.turno === 'Matutino').length}</div>
-        </div>
-        <div className="stat-card">
-          <div className="stat-label">Vespertino</div>
-          <div className="stat-value">{turmas.filter(t => t.turno === 'Vespertino').length}</div>
-        </div>
+        {[...new Set(turmas.map(t => t.turno))].sort().map(turno => (
+          <div className="stat-card" key={turno}>
+            <div className="stat-label">{turno}</div>
+            <div className="stat-value">{turmas.filter(t => t.turno === turno).length}</div>
+          </div>
+        ))}
         <div className="stat-card">
           <div className="stat-label">Disciplinas</div>
           <div className="stat-value" style={{ color: 'var(--primary)' }}>{disciplinas.length}</div>
