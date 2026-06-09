@@ -8,14 +8,14 @@ from starlette.middleware.base import BaseHTTPMiddleware
 
 class TrailingSlashMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
-        # Só corrige GET /api/{recurso} (lista) — ex: /api/alunos → /api/alunos/
-        # Não afeta POST/PUT/DELETE nem sub-rotas como /api/auth/login
-        if request.method == "GET":
-            path = request.scope.get("path", "")
-            segments = path.split("/")  # ['', 'api', 'recurso']
-            if len(segments) == 3 and path.startswith("/api/") and not path.endswith("/"):
-                request.scope["path"] = path + "/"
-                request.scope["raw_path"] = (path + "/").encode()
+        # Corrige /api/{recurso} → /api/{recurso}/ para todos os métodos
+        # Só afeta paths com exatamente 3 segmentos (ex: /api/alunos)
+        # Não afeta sub-rotas como /api/auth/login ou /api/alunos/123
+        path = request.scope.get("path", "")
+        segments = path.split("/")  # ['', 'api', 'recurso']
+        if len(segments) == 3 and path.startswith("/api/") and not path.endswith("/"):
+            request.scope["path"] = path + "/"
+            request.scope["raw_path"] = (path + "/").encode()
         return await call_next(request)
 
 from core.database import Base, engine
