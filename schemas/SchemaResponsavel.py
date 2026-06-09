@@ -9,8 +9,8 @@ class ResponsavelBase(BaseModel):
     parentesco: int
 
 class ResponsavelCreate(ResponsavelBase):
-    cpf: str = Field(..., pattern=r"^\d{11,15}$")
-    telefone: str = Field(..., pattern=r"^\+?\d{10,15}$")
+    cpf: str
+    telefone: str
 
 class ResponsavelResponse(ResponsavelBase):
     id: int
