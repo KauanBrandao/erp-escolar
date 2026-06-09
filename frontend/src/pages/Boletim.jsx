@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { api } from '../api/client'
 import { useToast } from '../components/Toast'
 import Modal from '../components/Modal'
@@ -58,6 +58,8 @@ export default function Boletim() {
   const [selAluno, setSelAluno] = useState('')
   const [searchAluno, setSearchAluno] = useState('')
   const [showSuggestions, setShowSuggestions] = useState(false)
+  const [dropPos, setDropPos] = useState({ top: 0, left: 0, width: 0 })
+  const searchWrapRef = useRef(null)
   const [activeTab, setActiveTab] = useState('notas')
   const [activeBim, setActiveBim] = useState(1)
 
@@ -201,9 +203,9 @@ export default function Boletim() {
       {/* Selector */}
       <div className="card" style={{ padding: '16px 20px' }}>
         <div className="boletim-controls">
-          <div style={{ flex: 1, minWidth: '200px', maxWidth: '380px', position: 'relative' }}>
+          <div style={{ flex: 1, minWidth: '200px', maxWidth: '380px' }}>
             <label style={{ display: 'block', marginBottom: '6px' }}>Aluno</label>
-            <div className="search-wrap" style={{ position: 'relative' }}>
+            <div className="search-wrap" ref={searchWrapRef}>
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
               </svg>
@@ -212,17 +214,27 @@ export default function Boletim() {
                 placeholder="Digite o nome do aluno..."
                 value={searchAluno}
                 onChange={e => { setSearchAluno(e.target.value); setShowSuggestions(true) }}
-                onFocus={() => setShowSuggestions(true)}
+                onFocus={() => {
+                  if (searchWrapRef.current) {
+                    const r = searchWrapRef.current.getBoundingClientRect()
+                    setDropPos({ top: r.bottom + 4, left: r.left, width: r.width })
+                  }
+                  setShowSuggestions(true)
+                }}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                 autoComplete="off"
               />
             </div>
             {showSuggestions && searchAluno.length > 0 && (
               <div style={{
-                position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                position: 'fixed',
+                top: dropPos.top,
+                left: dropPos.left,
+                width: dropPos.width,
+                zIndex: 9999,
                 background: 'var(--card-bg)', border: '1px solid var(--border)',
-                borderRadius: '8px', boxShadow: '0 4px 16px rgba(0,0,0,.12)',
-                maxHeight: '220px', overflowY: 'auto', marginTop: '4px',
+                borderRadius: '8px', boxShadow: '0 4px 16px rgba(0,0,0,.18)',
+                maxHeight: '220px', overflowY: 'auto',
               }}>
                 {alunos
                   .filter(a => a.nome.toLowerCase().includes(searchAluno.toLowerCase()))
