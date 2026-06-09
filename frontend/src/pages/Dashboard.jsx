@@ -179,10 +179,11 @@ export default function Dashboard() {
         api.get('/mensalidades'),
         api.get('/frequencias'),
         api.get('/comunicados'),
+        api.get('/pagamentos'),
       ])
-      const [alunos, turmas, matriculas, notas, mensalidades, frequencias, comunicados] =
+      const [alunos, turmas, matriculas, notas, mensalidades, frequencias, comunicados, pagamentos] =
         settled.map(r => r.status === 'fulfilled' ? r.value : [])
-      setData({ alunos, turmas, matriculas, notas, mensalidades, frequencias, comunicados })
+      setData({ alunos, turmas, matriculas, notas, mensalidades, frequencias, comunicados, pagamentos })
       setStatus('ok')
       setTimeout(() => setAnimated(true), 80)
     } catch (e) {
@@ -201,18 +202,34 @@ export default function Dashboard() {
     </div>
   )
 
-  const { alunos, turmas, matriculas, notas, mensalidades, frequencias, comunicados } = data
+  const { alunos, turmas, matriculas, notas, mensalidades, frequencias, comunicados, pagamentos } = data
 
   /* ── compute ── */
+  const anoAtual = new Date().getFullYear()
+
+  function getMensStatus(mens) {
+    const pag = pagamentos.find(p => p.mensalidade_id === mens.id)
+    if (pag) return 'pago'
+    const venc = new Date(mens.vencimento)
+    if (venc < new Date()) return 'atrasado'
+    return 'pendente'
+  }
+
   const alunosAtivos  = alunos.filter(a => a.ativo).length
   const mediaGeral    = avg(notas.map(n => n.valor))
   const freqTotal     = frequencias.length
   const freqMedia     = freqTotal ? Math.round(frequencias.filter(f => f.presente).length / freqTotal * 100) : null
-  const mPago         = mensalidades.filter(m => m.status === 'pago').length
-  const mPendente     = mensalidades.filter(m => m.status === 'pendente').length
-  const mAtrasado     = mensalidades.filter(m => m.status === 'atrasado').length
-  const mTotal        = mensalidades.length || 1
-  const valorRecebido = mensalidades.filter(m => m.status === 'pago').reduce((s, m) => s + Number(m.valor), 0)
+
+  // Financeiro: só o ano atual
+  const mensAnoAtual  = mensalidades.filter(m => m.ano === anoAtual)
+  const mPago         = mensAnoAtual.filter(m => getMensStatus(m) === 'pago').length
+  const mPendente     = mensAnoAtual.filter(m => getMensStatus(m) === 'pendente').length
+  const mAtrasado     = mensAnoAtual.filter(m => getMensStatus(m) === 'atrasado').length
+  const mTotal        = mensAnoAtual.length || 1
+  const valorRecebido = mensAnoAtual
+    .map(m => pagamentos.find(p => p.mensalidade_id === m.id))
+    .filter(Boolean)
+    .reduce((s, p) => s + Number(p.valor_pago), 0)
   const inadimplencia = Math.round((mAtrasado / mTotal) * 100)
 
   /* performance por turma */
@@ -323,7 +340,7 @@ export default function Dashboard() {
 
         {/* situação financeira */}
         <div className="card" style={{ padding: '22px 24px', animation: 'dash-fade-up 0.45s ease 0.25s both', display: 'flex', flexDirection: 'column', gap: 0 }}>
-          <SectionHead>Situação Financeira 2025</SectionHead>
+          <SectionHead>Situação Financeira {anoAtual}</SectionHead>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16, flex: 1 }}>
             {[
@@ -362,7 +379,7 @@ export default function Dashboard() {
             padding: '14px 16px',
           }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: 'var(--text-3)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: 4 }}>
-              Total arrecadado no ano
+              Total arrecadado em {anoAtual}
             </div>
             <div style={{ fontSize: 22, fontWeight: 700, color: '#059669', fontFamily: 'Syne, sans-serif', letterSpacing: '-0.02em' }}>
               {fmtBRL(valorRecebido)}
