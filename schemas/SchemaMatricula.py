@@ -12,7 +12,7 @@ class MatriculaBase(BaseModel):
     observacao: Optional[str] = None
 
 class MatriculaCreate(MatriculaBase):
-    pass
+    valor_mensalidade: float = 0.0
 
 class MatriculaResponse(MatriculaBase):
     id: int
