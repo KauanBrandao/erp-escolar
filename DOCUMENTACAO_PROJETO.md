@@ -259,13 +259,145 @@ Credenciais criadas pelo seed:
 
 ---
 
-## Deploy (Vercel + Supabase)
+## Deploy Automático — Como Funciona
 
-1. Fazer push para o branch `main` no GitHub
-2. A Vercel detecta o push e inicia um novo deploy automaticamente
-3. O backend roda como Serverless Function (`api/index.py`)
-4. O banco PostgreSQL fica no Supabase (região us-east-1)
-5. A conexão usa o **Connection Pooler** do Supabase (porta 6543) para compatibilidade com a Vercel Free
+### Visão geral do fluxo
+
+```
+Desenvolvedor
+     │
+     │  git push origin main
+     ▼
+  GitHub
+     │
+     │  webhook automático
+     ▼
+  Vercel
+     │
+     │  detecta push → inicia build → deploy
+     ▼
+  Produção (URL pública atualizada em ~30 segundos)
+```
+
+Não existe nenhuma etapa manual. Basta fazer `git push` e o sistema atualiza sozinho.
+
+---
+
+### O que a Vercel faz ao receber o push
+
+1. **Clona o repositório** na versão do commit mais recente
+2. **Detecta `api/index.py`** — qualquer arquivo Python dentro da pasta `api/` é tratado automaticamente como uma **Serverless Function**
+3. **Instala as dependências** listadas em `requirements.txt`
+4. **Coloca a função em produção** — a URL pública passa a apontar para este novo código
+
+O build do frontend **não é executado pela Vercel** — os arquivos já compilados em `frontend/dist/` são commitados no repositório e servidos diretamente pelo FastAPI.
+
+---
+
+### O papel de cada arquivo de configuração
+
+#### `vercel.json`
+
+```json
+{
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/api/index.py" }
+  ]
+}
+```
+
+Esta única regra diz à Vercel: **toda requisição HTTP** que chegar ao servidor (seja `GET /`, `GET /alunos`, `POST /api/auth/login`) deve ser encaminhada para `api/index.py`. Sem isso, a Vercel não saberia para onde rotear as requisições.
+
+#### `api/index.py`
+
+```python
+import sys, os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from main import app
+```
+
+É o **ponto de entrada da Serverless Function**. Ele apenas importa o objeto `app` do FastAPI definido em `main.py`. A Vercel exige que o arquivo esteja dentro de `api/` e que exporte um objeto compatível com ASGI (o FastAPI é ASGI por padrão).
+
+#### `main.py` — roteamento unificado (backend + frontend)
+
+O FastAPI cuida de duas responsabilidades:
+
+| Rota | O que acontece |
+|---|---|
+| `/api/*` | Processado pelo FastAPI (autenticação, banco de dados, etc.) |
+| `/assets/*` | Serve os arquivos JS/CSS do build do React |
+| `/*` (qualquer outra) | Serve o `frontend/dist/index.html` — o React assume o controle no navegador |
+
+Isso significa que **não existe um servidor separado para o frontend**. O próprio FastAPI serve os arquivos estáticos do React quando o caminho não começa com `/api/`.
+
+---
+
+### O que é uma Serverless Function
+
+Em um servidor tradicional, o código fica rodando 24 horas por dia esperando requisições. Na Vercel (modelo serverless):
+
+- A função **só existe durante a execução de uma requisição**
+- Quando não há requisições, **não há processo rodando** (e portanto não há custo)
+- Cada requisição pode ser executada em instâncias diferentes e paralelas
+- O **primeiro acesso após um período inativo** pode ser um pouco mais lento (cold start — a função precisa inicializar)
+
+Para este projeto, isso é ideal: o uso é esporádico e o custo é zero no plano gratuito.
+
+---
+
+### Variáveis de ambiente
+
+O banco de dados não pode ter sua URL com senha exposta no código-fonte. Por isso ela é configurada diretamente no painel da Vercel e **nunca aparece no GitHub**.
+
+**Como configurar:**
+
+1. Acesse **vercel.com** → seu projeto → **Settings** → **Environment Variables**
+2. Adicione:
+
+| Nome | Valor | Ambiente |
+|---|---|---|
+| `DATABASE_URL` | `postgresql://postgres.SEU_ID:SENHA@aws-1-us-east-1.pooler.supabase.com:6543/postgres` | Production, Preview, Development |
+
+3. Clique em **Save**
+4. Faça um novo deploy (ou redeploy) para que a variável entre em vigor
+
+O código lê essa variável em tempo de execução:
+
+```python
+# core/database.py
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+```
+
+---
+
+### Por que usar o Pooler do Supabase e não a conexão direta?
+
+O Supabase oferece duas formas de conexão:
+
+| Tipo | Porta | Protocolo |
+|---|---|---|
+| Conexão direta | 5432 | IPv6 |
+| Connection Pooler (PgBouncer) | 6543 | IPv4 |
+
+A Vercel Free **não suporta conexões IPv6 de saída**. Por isso, usar a URL da conexão direta (`db.SEU_ID.supabase.co:5432`) resulta em erro de rede. O Connection Pooler usa IPv4 e é compatível com a Vercel Free.
+
+A URL correta tem o formato:
+
+```
+postgresql://postgres.SEU_PROJECT_ID:SENHA@aws-1-us-east-1.pooler.supabase.com:6543/postgres
+```
+
+---
+
+### Resumo — o que precisa estar configurado para o deploy funcionar
+
+| Item | Onde configurar | Feito uma vez? |
+|---|---|---|
+| Repositório GitHub conectado à Vercel | Vercel Dashboard → Import Project | Sim |
+| `DATABASE_URL` com URL do pooler Supabase | Vercel → Settings → Environment Variables | Sim |
+| `vercel.json` com a regra de rewrite | Arquivo no repositório | Sim |
+| `api/index.py` importando o FastAPI | Arquivo no repositório | Sim |
+| `frontend/dist/` com o build do React | Gerado com `npm run build` e commitado | A cada mudança no frontend |
 
 ---
 
