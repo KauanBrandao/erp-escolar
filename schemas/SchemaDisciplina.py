@@ -8,6 +8,7 @@ class DisciplinaBase(BaseModel):
     codigo: str
     carga_horaria: int
     turma_id: int
+    professor_id: Optional[int] = None
 
 class DisciplinaCreate(DisciplinaBase):
     pass
@@ -23,3 +24,4 @@ class DisciplinaUpdate(BaseModel):
     codigo: Optional[str] = None
     carga_horaria: Optional[int] = None
     turma_id: Optional[int] = None
+    professor_id: Optional[int] = None

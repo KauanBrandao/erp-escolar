@@ -34,6 +34,8 @@ class DisciplinaRepository:
             disciplina.carga_horaria = dados.carga_horaria
         if dados.turma_id is not None:
             disciplina.turma_id = dados.turma_id
+        if dados.professor_id is not None:
+            disciplina.professor_id = dados.professor_id
 
         self.db.commit()
         self.db.refresh(disciplina)
