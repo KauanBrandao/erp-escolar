@@ -1,14 +1,14 @@
-﻿from pydantic import BaseModel, EmailStr, Field
+﻿from pydantic import BaseModel, Field
 
 
 class LoginRequest(BaseModel):
-    email: EmailStr
+    email: str
     senha: str = Field(min_length=8, max_length=100)
 
 
 class SetupAdminRequest(BaseModel):
     nome: str = Field(min_length=3, max_length=100)
-    email: EmailStr
+    email: str
     senha: str = Field(min_length=8, max_length=100)
 
 
@@ -20,7 +20,7 @@ class TokenResponse(BaseModel):
 class MeResponse(BaseModel):
     id: int
     nome: str
-    email: EmailStr
+    email: str
     ativo: bool
     perfil_id: int
     perfil_nome: str

@@ -1,11 +1,11 @@
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 
 
 class ResponsavelBase(BaseModel):
     nome: str = Field(..., min_length=3, max_length=100)
-    email: EmailStr
+    email: str
     parentesco: int
 
 class ResponsavelCreate(ResponsavelBase):
@@ -22,5 +22,5 @@ class ResponsavelResponse(ResponsavelBase):
 
 class ResponsavelUpdate(BaseModel):
     nome: Optional[str] = None
-    email: Optional[EmailStr] = None
+    email: Optional[str] = None
     parentesco: Optional[int] = None
