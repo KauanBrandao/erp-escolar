@@ -4,23 +4,23 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  /* primary */
-  --primary:        #4f46e5;
-  --primary-hover:  #4338ca;
-  --primary-light:  #eef2ff;
-  --primary-ring:   rgba(79,70,229,.25);
+  /* primary — azul escolar */
+  --primary:        #1d6fbd;
+  --primary-hover:  #1558a0;
+  --primary-light:  #dbeafe;
+  --primary-ring:   rgba(29,111,189,.22);
 
   /* surfaces */
-  --bg:             #f1f5f9;
+  --bg:             #f0f7ff;
   --surface:        #ffffff;
-  --surface-2:      #f8fafc;
-  --border:         #e2e8f0;
-  --border-2:       #cbd5e1;
+  --surface-2:      #f5f9ff;
+  --border:         #dde8f5;
+  --border-2:       #b8d0ea;
 
   /* text */
-  --text:           #0f172a;
-  --text-2:         #475569;
-  --text-3:         #94a3b8;
+  --text:           #0c1e35;
+  --text-2:         #3b5878;
+  --text-3:         #7fa3c4;
 
   /* status */
   --success:        #059669;
@@ -32,18 +32,18 @@
   --danger:         #dc2626;
   --danger-bg:      #fef2f2;
   --danger-border:  #fca5a5;
-  --info:           #2563eb;
+  --info:           #1d6fbd;
   --info-bg:        #eff6ff;
   --info-border:    #93c5fd;
 
-  /* sidebar */
-  --sidebar-bg:         #0f172a;
-  --sidebar-surface:    #1e293b;
-  --sidebar-hover:      rgba(255,255,255,.06);
-  --sidebar-active:     rgba(99,102,241,.18);
-  --sidebar-text:       rgba(255,255,255,.5);
-  --sidebar-text-act:   #a5b4fc;
-  --sidebar-border:     rgba(255,255,255,.07);
+  /* sidebar — azul escolar profundo */
+  --sidebar-bg:         #0d3b6e;
+  --sidebar-surface:    #154f94;
+  --sidebar-hover:      rgba(255,255,255,.08);
+  --sidebar-active:     rgba(255,255,255,.14);
+  --sidebar-text:       rgba(255,255,255,.55);
+  --sidebar-text-act:   #93c5fd;
+  --sidebar-border:     rgba(255,255,255,.1);
 
   /* radius */
   --r-sm:  6px;
@@ -97,7 +97,7 @@ body {
   position: absolute;
   top: -80px; right: -80px;
   width: 240px; height: 240px;
-  background: radial-gradient(circle, rgba(99,102,241,.15) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(147,197,253,.12) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -119,7 +119,7 @@ body {
   font-weight: 700;
   color: #fff;
   flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(79,70,229,.4);
+  box-shadow: 0 4px 12px rgba(29,111,189,.45);
 }
 
 .sidebar-logo-text { display: flex; flex-direction: column; }
@@ -196,13 +196,13 @@ body {
 .nav-item.active .nav-icon { opacity: 1; }
 .nav-badge {
   margin-left: auto;
-  background: rgba(165,180,252,.15);
-  color: #a5b4fc;
+  background: rgba(147,197,253,.15);
+  color: #93c5fd;
   font-size: 10px;
   font-weight: 600;
   padding: 1px 6px;
   border-radius: 20px;
-  border: 1px solid rgba(165,180,252,.2);
+  border: 1px solid rgba(147,197,253,.22);
 }
 
 .sidebar-footer {
@@ -330,12 +330,12 @@ h3 {
   background: var(--primary);
   color: #fff;
   border-color: var(--primary);
-  box-shadow: 0 1px 2px rgba(79,70,229,.3);
+  box-shadow: 0 1px 2px rgba(29,111,189,.3);
 }
 .btn-primary:hover {
   background: var(--primary-hover);
   border-color: var(--primary-hover);
-  box-shadow: 0 3px 8px rgba(79,70,229,.35);
+  box-shadow: 0 3px 8px rgba(29,111,189,.35);
 }
 
 .btn-secondary {
@@ -468,7 +468,7 @@ select { cursor: pointer; }
   position: absolute;
   top: -20px; right: -20px;
   width: 80px; height: 80px;
-  background: radial-gradient(circle, var(--dot-color, rgba(79,70,229,.08)) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--dot-color, rgba(29,111,189,.08)) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -597,7 +597,7 @@ td {
 }
 tbody tr:last-child td { border-bottom: none; }
 tbody tr { transition: background .1s; }
-tbody tr:hover { background: #fafafa; }
+tbody tr:hover { background: #f0f7ff; }
 
 .td-name { font-weight: 500; }
 .td-mono {
@@ -697,7 +697,7 @@ tbody tr:hover { background: #fafafa; }
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15,23,42,.55);
+  background: rgba(13,59,110,.45);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
@@ -827,7 +827,7 @@ tbody tr:hover { background: #fafafa; }
 .confirm-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(15,23,42,.55);
+  background: rgba(13,59,110,.45);
   backdrop-filter: blur(4px);
   display: flex;
   align-items: center;
