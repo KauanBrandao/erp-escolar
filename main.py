@@ -35,19 +35,19 @@ app.add_middleware(
 
 
 
-app.include_router(auth_router)
-app.include_router(aluno_router)
-app.include_router(turma_router)
-app.include_router(matricula_router)
-app.include_router(nota_router)
-app.include_router(comunicado_router)
-app.include_router(disciplina_router)
-app.include_router(frequencia_router)
-app.include_router(mensalidade_router)
-app.include_router(pagamento_router)
-app.include_router(perfil_router)
-app.include_router(responsavel_router)
-app.include_router(user_router)
+app.include_router(auth_router, prefix="/api")
+app.include_router(aluno_router, prefix="/api")
+app.include_router(turma_router, prefix="/api")
+app.include_router(matricula_router, prefix="/api")
+app.include_router(nota_router, prefix="/api")
+app.include_router(comunicado_router, prefix="/api")
+app.include_router(disciplina_router, prefix="/api")
+app.include_router(frequencia_router, prefix="/api")
+app.include_router(mensalidade_router, prefix="/api")
+app.include_router(pagamento_router, prefix="/api")
+app.include_router(perfil_router, prefix="/api")
+app.include_router(responsavel_router, prefix="/api")
+app.include_router(user_router, prefix="/api")
 
 _DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend", "dist")
 
