@@ -1,7 +1,8 @@
-﻿import os
+﻿import mimetypes
+import os
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import Response
 
 from core.database import Base, engine
 from routers.RouterAluno import router as aluno_router
@@ -53,10 +54,16 @@ _DIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), "frontend", "di
 @app.get("/assets/{file_path:path}", include_in_schema=False)
 def serve_assets(file_path: str):
     full = os.path.join(_DIST, "assets", file_path)
-    if os.path.isfile(full):
-        return FileResponse(full)
-    raise HTTPException(status_code=404)
+    if not os.path.isfile(full):
+        raise HTTPException(status_code=404)
+    mime_type, _ = mimetypes.guess_type(full)
+    with open(full, "rb") as f:
+        return Response(content=f.read(), media_type=mime_type or "application/octet-stream")
 
 @app.get("/{full_path:path}", include_in_schema=False)
 def serve_frontend(full_path: str):
-    return FileResponse(os.path.join(_DIST, "index.html"))
+    index = os.path.join(_DIST, "index.html")
+    if not os.path.isfile(index):
+        raise HTTPException(status_code=404, detail=f"index.html not found at {index}")
+    with open(index, "rb") as f:
+        return Response(content=f.read(), media_type="text/html")
