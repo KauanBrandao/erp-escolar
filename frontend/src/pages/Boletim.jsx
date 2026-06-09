@@ -56,6 +56,8 @@ export default function Boletim() {
   const [error, setError] = useState(null)
 
   const [selAluno, setSelAluno] = useState('')
+  const [searchAluno, setSearchAluno] = useState('')
+  const [showSuggestions, setShowSuggestions] = useState(false)
   const [activeTab, setActiveTab] = useState('notas')
   const [activeBim, setActiveBim] = useState(1)
 
@@ -81,7 +83,10 @@ export default function Boletim() {
         api.get('/frequencias'),
       ])
       setAlunos(a); setDisciplinas(d); setMatriculas(m); setTurmas(t); setNotas(n); setFrequencias(f)
-      if (a.length && !selAluno) setSelAluno(String(a[0].id))
+      if (a.length && !selAluno) {
+        setSelAluno(String(a[0].id))
+        setSearchAluno(a[0].nome)
+      }
     } catch (e) { setError(e.message) }
     finally { setLoading(false) }
   }
@@ -196,11 +201,59 @@ export default function Boletim() {
       {/* Selector */}
       <div className="card" style={{ padding: '16px 20px' }}>
         <div className="boletim-controls">
-          <div style={{ flex: 1, minWidth: '200px', maxWidth: '340px' }}>
+          <div style={{ flex: 1, minWidth: '200px', maxWidth: '380px', position: 'relative' }}>
             <label style={{ display: 'block', marginBottom: '6px' }}>Aluno</label>
-            <select className="boletim-select" value={selAluno} onChange={e => setSelAluno(e.target.value)}>
-              {alunos.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
-            </select>
+            <div className="search-wrap" style={{ position: 'relative' }}>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+              </svg>
+              <input
+                className="search-input"
+                placeholder="Digite o nome do aluno..."
+                value={searchAluno}
+                onChange={e => { setSearchAluno(e.target.value); setShowSuggestions(true) }}
+                onFocus={() => setShowSuggestions(true)}
+                onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+                autoComplete="off"
+              />
+            </div>
+            {showSuggestions && searchAluno.length > 0 && (
+              <div style={{
+                position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 50,
+                background: 'var(--card-bg)', border: '1px solid var(--border)',
+                borderRadius: '8px', boxShadow: '0 4px 16px rgba(0,0,0,.12)',
+                maxHeight: '220px', overflowY: 'auto', marginTop: '4px',
+              }}>
+                {alunos
+                  .filter(a => a.nome.toLowerCase().includes(searchAluno.toLowerCase()))
+                  .slice(0, 8)
+                  .map(a => (
+                    <div
+                      key={a.id}
+                      onMouseDown={() => {
+                        setSelAluno(String(a.id))
+                        setSearchAluno(a.nome)
+                        setShowSuggestions(false)
+                      }}
+                      style={{
+                        padding: '9px 14px', cursor: 'pointer', fontSize: '13.5px',
+                        color: 'var(--text-1)',
+                        background: String(a.id) === selAluno ? 'var(--primary-light, #eff6ff)' : 'transparent',
+                        borderBottom: '1px solid var(--border)',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-2)'}
+                      onMouseLeave={e => e.currentTarget.style.background = String(a.id) === selAluno ? 'var(--primary-light, #eff6ff)' : 'transparent'}
+                    >
+                      {a.nome}
+                    </div>
+                  ))}
+                {alunos.filter(a => a.nome.toLowerCase().includes(searchAluno.toLowerCase())).length === 0 && (
+                  <div style={{ padding: '12px 14px', color: 'var(--text-3)', fontSize: '13px' }}>
+                    Nenhum aluno encontrado
+                  </div>
+                )}
+              </div>
+            )}
           </div>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '8px' }}>
             <button className="btn btn-secondary" onClick={() => {
