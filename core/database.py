@@ -20,7 +20,10 @@ elif _url.startswith("postgresql://"):
 
 SQLALCHEMY_DATABASE_URL = _url
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL,
+    connect_args={"sslmode": "require"} if "supabase" in SQLALCHEMY_DATABASE_URL else {},
+)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
