@@ -63,11 +63,20 @@ export default function Boletim() {
   const alunoNotas = notas.filter(n => n.aluno_id === alunoId)
   const alunoFreqs = frequencias.filter(f => f.aluno_id === alunoId)
 
-  // Disciplinas apenas da turma do aluno selecionado
+  // Disciplinas apenas da turma do aluno selecionado (grid do boletim)
   const alunoMatricula = matriculas.find(m => m.aluno_id === alunoId)
   const alunoDisciplinas = alunoMatricula
     ? disciplinas.filter(d => d.turma_id === alunoMatricula.turma_id)
     : disciplinas
+
+  // Disciplinas filtradas para os modais (baseadas no aluno escolhido dentro do modal)
+  function getDiscipinasDoAluno(alunoIdStr) {
+    const id = Number(alunoIdStr)
+    const mat = matriculas.find(m => m.aluno_id === id)
+    return mat ? disciplinas.filter(d => d.turma_id === mat.turma_id) : disciplinas
+  }
+  const nModalDiscs = getDiscipinasDoAluno(nForm.aluno_id)
+  const fModalDiscs = getDiscipinasDoAluno(fForm.aluno_id)
 
   // Agrupar notas por disciplina + bimestre
   function getNotaGrid() {
@@ -305,7 +314,7 @@ export default function Boletim() {
         <div className="form-grid form-grid-2">
           <div className="form-field full">
             <label>Aluno *</label>
-            <select value={nForm.aluno_id} onChange={e => setNForm(f => ({ ...f, aluno_id: e.target.value }))}>
+            <select value={nForm.aluno_id} onChange={e => setNForm(f => ({ ...f, aluno_id: e.target.value, disciplina_id: '' }))}>
               <option value="">Selecione</option>
               {alunos.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
             </select>
@@ -314,7 +323,7 @@ export default function Boletim() {
             <label>Disciplina *</label>
             <select value={nForm.disciplina_id} onChange={e => setNForm(f => ({ ...f, disciplina_id: e.target.value }))}>
               <option value="">Selecione</option>
-              {disciplinas.map(d => <option key={d.id} value={d.id}>{d.nome}</option>)}
+              {nModalDiscs.map(d => <option key={d.id} value={d.id}>{d.nome}</option>)}
             </select>
           </div>
           <div className="form-field">
@@ -349,7 +358,7 @@ export default function Boletim() {
         <div className="form-grid form-grid-2">
           <div className="form-field full">
             <label>Aluno *</label>
-            <select value={fForm.aluno_id} onChange={e => setFForm(f => ({ ...f, aluno_id: e.target.value }))}>
+            <select value={fForm.aluno_id} onChange={e => setFForm(f => ({ ...f, aluno_id: e.target.value, disciplina_id: '' }))}>
               <option value="">Selecione</option>
               {alunos.map(a => <option key={a.id} value={a.id}>{a.nome}</option>)}
             </select>
@@ -358,7 +367,7 @@ export default function Boletim() {
             <label>Disciplina *</label>
             <select value={fForm.disciplina_id} onChange={e => setFForm(f => ({ ...f, disciplina_id: e.target.value }))}>
               <option value="">Selecione</option>
-              {disciplinas.map(d => <option key={d.id} value={d.id}>{d.nome}</option>)}
+              {fModalDiscs.map(d => <option key={d.id} value={d.id}>{d.nome}</option>)}
             </select>
           </div>
           <div className="form-field">
